@@ -1,0 +1,42 @@
+{
+  "name": "rparchiver-bot",
+  "version": "1.0.0",
+  "description": "Archiving bot for Avalon's Gate RP server",
+  "main": "build/index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node --trace-warnings build/index.mjs",
+    "deploycmds": "node --trace-warnings ./scripts/deploy-cmds.mjs",
+    "prebuild": "node ./scripts/clear-build.mjs",
+    "build": "npx tsc",
+    "prepushbuild": "npm run build && git add build/ && git commit -m \"[pushbuild]: Pushing new build files\"",
+    "pushbuild": "git push",
+    "test": "node ./scripts/clear-build.mjs && npx tsc && node build/index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/louistmt/RPArchiver-bot.git"
+  },
+  "keywords": [
+    "DiscordBot",
+    "Archiving"
+  ],
+  "author": "Luis Ferreira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/louistmt/RPArchiver-bot/issues"
+  },
+  "homepage": "https://github.com/louistmt/RPArchiver-bot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^1.4.0",
+    "@discordjs/rest": "^0.3.0",
+    "discord-api-types": "^0.27.2",
+    "discord-markdown": "^2.5.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "pdfkit": "^0.13.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}

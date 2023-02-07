@@ -5,6 +5,7 @@ import { Job } from "../libs/worker/index.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import { preLogs } from "../utils.mjs";
+import { retrieveArchiveData } from "../api/archival.mjs";
 const serversConfig = ServersConfigChest.get();
 const { log } = preLogs("Archive");
 const definition = new SlashCommandBuilder();
@@ -27,6 +28,11 @@ async function execute(interaction) {
     const { archiveServerId, logChannelId } = serversConfig.getOrCreate(srcServerId);
     if (archiveServerId.length === 0 || logChannelId.length === 0) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. Archive server is not yet configured.`);
+        return;
+    }
+    const { catNamesIds } = await retrieveArchiveData(archiveServerId);
+    if (!catNamesIds.has(destCategoryName)) {
+        await interaction.reply(`Couldn't queue ${srcChannelName} for archive. The category '${destCategoryName}' does not exist`);
         return;
     }
     const job = Job.create(srcChannelName, {

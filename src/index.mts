@@ -85,7 +85,7 @@ function startup() {
 
     client.once("ready", () => {
         log("Bot is online");
-        client.user.setActivity("as an humble slave", {type: "LISTENING"});
+        client.user.setActivity("the role of a slave", {type: "PLAYING"});
     });
 
     client.login(Config.token);

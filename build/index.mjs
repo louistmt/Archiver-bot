@@ -72,7 +72,7 @@ function startup() {
     client.on("error", error);
     client.once("ready", () => {
         log("Bot is online");
-        client.user.setActivity("as an humble slave", { type: "LISTENING" });
+        client.user.setActivity("the slave", { type: "PLAYING" });
     });
     client.login(Config.token);
 }

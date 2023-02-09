@@ -9,8 +9,6 @@
     "deploycmds": "node --trace-warnings ./scripts/deploy-cmds.mjs",
     "prebuild": "node ./scripts/clear-build.mjs",
     "build": "npx tsc",
-    "prepushbuild": "npm run build && git add build/ && git commit -m \"[pushbuild]: Pushing new build files\"",
-    "pushbuild": "git push",
     "test": "node ./scripts/clear-build.mjs && npx tsc && node build/index.mjs"
   },
   "repository": {

@@ -10,8 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env: 
-      CI_COMMIT_MESSAGE: '[pushbuild]: Pushing new build files'
-      CI_COMMIT_AUTHOR: '[pushbuild]'
+      CI_COMMIT_MESSAGE: '[pushdist]: Pushing new dist files'
+      CI_COMMIT_AUTHOR: '[pushdist]'
     steps:
     - uses: actions/checkout@v3
 
@@ -21,8 +21,8 @@ jobs:
         node-version: '18.12.1' 
     - name: Node Install
       run: npm ci
-    - name: Node Build
-      run: npm run build
+    - name: Node Dist
+      run: npm run dist
 
     # Commit and push all changed files.
     - name: GIT Commit Build

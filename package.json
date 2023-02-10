@@ -2,14 +2,19 @@
   "name": "rparchiver-bot",
   "version": "1.0.0",
   "description": "Archiving bot for Avalon's Gate RP server",
-  "main": "build/index.mjs",
+  "main": "dist/index.mjs",
   "type": "module",
   "scripts": {
-    "start": "node --trace-warnings build/index.mjs",
+    "start": "node --trace-warnings dist/index.mjs",
+
     "deploycmds": "node --trace-warnings ./scripts/deploy-cmds.mjs",
+
     "prebuild": "node ./scripts/clear-build.mjs",
-    "build": "npx tsc",
-    "test": "node ./scripts/clear-build.mjs && npx tsc && node build/index.mjs"
+    "build": "npx tsc --outDir ./build",
+    "test": "npm run build && node --trace-warnings build/index.mjs",
+
+    "predist": "node ./script/clear-dist.mjs",
+    "dist": "npx tsc"
   },
   "repository": {
     "type": "git",

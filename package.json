@@ -13,7 +13,7 @@
     "build": "npx tsc --outDir ./build",
     "test": "npm run build && node --trace-warnings build/index.mjs",
 
-    "predist": "node ./script/clear-dist.mjs",
+    "predist": "node ./scripts/clear-dist.mjs",
     "dist": "npx tsc"
   },
   "repository": {

@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  build:
+  dist:
     runs-on: ubuntu-latest
     env: 
       CI_COMMIT_MESSAGE: '[pushdist]: Pushing new dist files'
@@ -25,7 +25,7 @@ jobs:
       run: npm run dist
 
     # Commit and push all changed files.
-    - name: GIT Commit Build
+    - name: GIT Commit Dist
       # Only run on main branch push (e.g. after pull request merge).
       if: github.event_name == 'push'
       run: |

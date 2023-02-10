@@ -5,7 +5,8 @@ import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
 import { postMessageToWebhook, deleteWebhook } from "../api/webhooks.mjs";
 import { postMessage, deleteChannel } from "../api/channels.mjs";
 import { JobState, Task, Worker } from "../libs/worker/index.mjs";
-const { log, error: logError } = preLogs("Archiver");
+import { HTTPError } from "discord.js";
+const { error: logError } = preLogs("Archiver");
 const serversConfig = ServersConfigChest.get();
 const createDestTask = Task.create("Create Destination Channel");
 createDestTask.work(async (job) => {
@@ -23,6 +24,14 @@ createDestTask.work(async (job) => {
         webhookToken: webhookToken
     });
 });
+createDestTask.errors()
+    .default(async (job) => {
+    if (job.err instanceof HTTPError) {
+        await delay(10 * 1000);
+        return job.repeatTask(job.data);
+    }
+    return job;
+});
 const getRpMsgsTask = Task.create("Get Rp Messages");
 getRpMsgsTask.work(async (job) => {
     const { data } = job;
@@ -33,6 +42,14 @@ getRpMsgsTask.work(async (job) => {
         msgs,
         msgCount: msgs.length
     });
+});
+getRpMsgsTask.errors()
+    .default(async (job) => {
+    if (job.err instanceof HTTPError) {
+        await delay(10 * 1000);
+        return job.repeatTask(job.data);
+    }
+    return job;
 });
 const sendRpMsgsTask = Task.create("Send rp Messages");
 sendRpMsgsTask.work(async (job) => {
@@ -48,6 +65,14 @@ sendRpMsgsTask.work(async (job) => {
         return job.from({ serverId, srcServerId, srcChannelId, webhookId, srcChannelName });
     return job;
 });
+sendRpMsgsTask.errors()
+    .default(async (job) => {
+    if (job.err instanceof HTTPError) {
+        await delay(10 * 1000);
+        return job.repeatTask(job.data);
+    }
+    return job;
+});
 const cleanupTask = Task.create("Cleanup");
 cleanupTask.work(async (job) => {
     const { data } = job;
@@ -60,6 +85,14 @@ cleanupTask.work(async (job) => {
     }
     await deleteChannel(srcChannelId);
     await postMessage(serversConfig.getOrCreate(srcServerId).logChannelId, `Finished archiving ${srcChannelName}`);
+    return job;
+});
+cleanupTask.errors()
+    .default(async (job) => {
+    if (job.err instanceof HTTPError) {
+        await delay(10 * 1000);
+        return job.repeatTask(job.data);
+    }
     return job;
 });
 const Archiver = Worker.create("Archiver");

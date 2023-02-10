@@ -1,12 +1,13 @@
 import Config from "../config.mjs";
 import { preLogs, delay, fileExists } from "../utils.mjs";
 import ServersConfigChest from "../data/server-config.mjs";
-import { createArchiveChannel, retrieveAllMessages, ArchivalError } from "../api/archival.mjs";
+import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
 import { postMessageToWebhook, deleteWebhook } from "../api/webhooks.mjs";
 import { postMessage, deleteChannel } from "../api/channels.mjs";
 import { JobState, Task, Worker } from "../libs/worker/index.mjs";
+import { HTTPError } from "discord.js";
 
-const {log, error: logError} = preLogs("Archiver");
+const { error: logError } = preLogs("Archiver");
 const serversConfig = ServersConfigChest.get();
 
 type RpMessage = {
@@ -54,6 +55,7 @@ type CleanupJob = {
     webhookId: string
 }
 
+
 const createDestTask = Task.create<RpArchiveJob, GetRpMsgsJob>("Create Destination Channel")
 createDestTask.work(async (job) => {
     const { data } = job;
@@ -71,6 +73,16 @@ createDestTask.work(async (job) => {
         webhookToken: webhookToken as string
     });
 })
+createDestTask.errors()
+    .default(async (job) => {
+        if (job.err instanceof HTTPError) {
+            await delay(10 * 1000);
+            return job.repeatTask(job.data)
+        }
+
+        return job;
+    })
+
 
 const getRpMsgsTask = Task.create<GetRpMsgsJob, SendRpMsgsJob>("Get Rp Messages")
 getRpMsgsTask.work(async (job) => {
@@ -84,6 +96,16 @@ getRpMsgsTask.work(async (job) => {
         msgCount: msgs.length
     });
 })
+getRpMsgsTask.errors()
+    .default(async (job) => {
+        if (job.err instanceof HTTPError) {
+            await delay(10 * 1000);
+            return job.repeatTask(job.data)
+        }
+
+        return job;
+    })
+
 
 const sendRpMsgsTask = Task.create<SendRpMsgsJob, CleanupJob>("Send rp Messages")
 sendRpMsgsTask.work(async (job) => {
@@ -91,16 +113,26 @@ sendRpMsgsTask.work(async (job) => {
     const { serverId, srcServerId, webhookId, webhookToken, srcChannelId, msgs, srcChannelName } = data;
 
     while (msgs.length > 0 && job.state !== JobState.CANCELED && job.state !== JobState.WORKER_SHUTDOWN) {
-        const {avatarUrl, content, username} = msgs[0];
+        const { avatarUrl, content, username } = msgs[0];
         await delay(3 * 1000);
         await postMessageToWebhook(webhookId, webhookToken, avatarUrl, username, content);
 
         msgs.shift();
     }
 
-    if ( msgs.length === 0 ) return job.from<CleanupJob>({serverId, srcServerId, srcChannelId, webhookId, srcChannelName});
+    if (msgs.length === 0) return job.from<CleanupJob>({ serverId, srcServerId, srcChannelId, webhookId, srcChannelName });
     return job;
 })
+sendRpMsgsTask.errors()
+    .default(async (job) => {
+        if (job.err instanceof HTTPError) {
+            await delay(10 * 1000);
+            return job.repeatTask(job.data)
+        }
+
+        return job;
+    })
+
 
 const cleanupTask = Task.create<CleanupJob, CleanupJob>("Cleanup")
 cleanupTask.work(async (job) => {
@@ -109,7 +141,7 @@ cleanupTask.work(async (job) => {
 
     try {
         await deleteWebhook(webhookId)
-    } catch(err) {
+    } catch (err) {
         logError(err)
     }
 
@@ -117,6 +149,16 @@ cleanupTask.work(async (job) => {
     await postMessage(serversConfig.getOrCreate(srcServerId).logChannelId, `Finished archiving ${srcChannelName}`)
     return job
 })
+cleanupTask.errors()
+    .default(async (job) => {
+        if (job.err instanceof HTTPError) {
+            await delay(10 * 1000);
+            return job.repeatTask(job.data)
+        }
+
+        return job;
+    })
+
 
 const Archiver = Worker.create<RpArchiveJob>("Archiver")
 Archiver.tasks()

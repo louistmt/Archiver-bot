@@ -1,6 +1,4 @@
-import Config from "../config.mjs";
-import { PirateChest } from "../libs/pirate-chest/index.mjs";
-class ServersConfig {
+export default class ServersConfig {
     configMap = new Map();
     getOrCreate(serverId) {
         if (!this.configMap.has(serverId))
@@ -24,5 +22,3 @@ class ServersConfig {
         }
     }
 }
-const ServersConfigChest = PirateChest.open(Config.paths.serversConfig, new ServersConfig());
-export default ServersConfigChest;

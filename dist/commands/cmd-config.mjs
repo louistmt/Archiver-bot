@@ -2,7 +2,7 @@ import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/b
 import { REST } from "@discordjs/rest";
 import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import { produceSubExecsMap } from "../libs/cmds.mjs";
-import ServersConfigChest from "../data/server-config.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
 import Config from "../config.mjs";
 const rest = new REST({ version: '9' }).setToken(Config.token);
 const serversConfig = ServersConfigChest.get();

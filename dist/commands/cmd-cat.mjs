@@ -3,7 +3,7 @@ import { produceSubExecsMap } from "../libs/cmds.mjs";
 import Config from "../config.mjs";
 import { retrieveArchiveData } from "../api/archival.mjs";
 import { createChannel, ChannelTypes } from "../api/channels.mjs";
-import ServersConfigChest from "../data/server-config.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 const serversConfig = ServersConfigChest.get();
 const catAddDefinition = new SlashCommandSubcommandBuilder();

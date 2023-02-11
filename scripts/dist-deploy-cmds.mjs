@@ -1,8 +1,8 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 
-import {definitionsList} from "../build/commands/index.mjs";
-import Config from "../build/config.mjs";
+import {definitionsList} from "../dist/commands/index.mjs";
+import Config from "../dist/config.mjs";
 
 
 const commands = [];

@@ -1,5 +1,5 @@
 import { getChannel } from "../api/channels.mjs";
-import ServersConfigChest from "../data/server-config.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
 import Archiver from "../workers/archiver.mjs";
 import { RpArchiveJob } from "../workers/archiver.mjs";
 import { Job } from "../libs/worker/index.mjs";

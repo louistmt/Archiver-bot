@@ -1,5 +1,3 @@
-import Config from "../config.mjs";
-import { PirateChest } from "../libs/pirate-chest/index.mjs";
 import { ISerializable } from "../libs/pirate-chest/types.mjs";
 import { JSONObject } from "../libs/common.mjs";
 
@@ -9,7 +7,7 @@ type ServerConfig = {
     logChannelId: string
 };
 
-class ServersConfig implements ISerializable {
+export default class ServersConfig implements ISerializable {
     configMap: Map<string, ServerConfig> = new Map();
 
     getOrCreate(serverId: string): ServerConfig {
@@ -36,7 +34,3 @@ class ServersConfig implements ISerializable {
         }
     }
 }
-
-const ServersConfigChest = PirateChest.open<ServersConfig>(Config.paths.serversConfig, new ServersConfig())
-
-export default ServersConfigChest;

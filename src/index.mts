@@ -3,7 +3,7 @@ import Archiver from "./workers/archiver.mjs";
 import Config from "./config.mjs";
 import { execsMap } from "./commands/index.mjs";
 import { singleCallFix, preLogs } from "./utils.mjs";
-import ServersConfigChest from "./data/server-config.mjs";
+import { ServersConfigChest } from "./data/index.mjs";
 
 
 let client: Client = undefined

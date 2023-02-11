@@ -1,6 +1,6 @@
 import Config from "../config.mjs";
 import { preLogs, delay, fileExists } from "../utils.mjs";
-import ServersConfigChest from "../data/server-config.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
 import { postMessageToWebhook, deleteWebhook } from "../api/webhooks.mjs";
 import { postMessage, deleteChannel } from "../api/channels.mjs";

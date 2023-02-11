@@ -4,7 +4,7 @@ import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import { CommandInteraction } from "discord.js";
 
 import { Command, produceSubExecsMap } from "../libs/cmds.mjs";
-import ServersConfigChest from "../data/server-config.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
 import Config from "../config.mjs";
 
 

@@ -123,13 +123,16 @@ export class ChestMigration<T extends ISerializable> {
             const targetVersion = md5Signature(instance.constructor.toString())
             let {data, classVersion} = obj;
 
+            log(`Attempting to migrate from ${classVersion} to ${targetVersion}`);
             while (targetVersion !== classVersion) {
                 if (!versionMap.has(classVersion)) throw Error(`Migration failed. Could to find solver for version ${classVersion}`);
                 const {solve, toVersion} = versionMap.get(classVersion);
+                log(`Migrating from version ${classVersion} to ${toVersion}`);
                 data = solve(data);
                 classVersion = toVersion;
             }
 
+            log(`Migration to version ${targetVersion} successful`);
             obj.data = data;
             obj.classVersion = classVersion;
             return obj;

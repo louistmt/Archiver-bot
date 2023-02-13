@@ -10,7 +10,7 @@ You will need nodejs 18.12.1 or higher to run this bot (might run on versions be
 - Unzip the folder into a directory of your preference. You should have something like `your-directory/Archiver-bot`.
 - Open your terminal or command like and navigate to `your-directory/Archiver-bot`.
 - Run the command ```npm install --production```. This will install all the dependencies the bot needs to run but not the ones needed for development.
-- If everything went right, now the only thing left to do some setup. See the Setup section for this.
+- If everything went right, now the only thing left to do is some setup. See the following section for this.
 
 # Setup
 

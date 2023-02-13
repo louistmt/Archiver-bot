@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
 import { fileExists, preLogs, readJSONFile, writeJSONFile } from "../../utils.mjs";
+import { md5Signature } from "../common.mjs";
 const { log } = preLogs("PirateChest");
 export class PirateChest {
     filePath;
@@ -19,8 +19,7 @@ export class PirateChest {
     }
     load() {
         const instance = this.instance;
-        const iClassBytes = Buffer.from(instance.constructor.toString());
-        const iClassVersion = createHash("md5").update(iClassBytes).digest("hex");
+        const iClassVersion = md5Signature(instance.constructor.toString());
         let obj;
         if (fileExists(this.filePath)) {
             obj = readJSONFile(this.filePath);
@@ -38,8 +37,7 @@ export class PirateChest {
     }
     save() {
         const instance = this.instance;
-        const classBytes = Buffer.from(instance.constructor.toString());
-        const classVersion = createHash("md5").update(classBytes).digest("hex");
+        const classVersion = md5Signature(instance.constructor.toString());
         const obj = { classVersion, data: instance.serialize() };
         writeJSONFile(this.filePath, obj);
     }
@@ -64,23 +62,49 @@ export class DefaultSerialization {
 }
 export class DefaultSolveStrategies {
     static throwError(obj, instance) {
-        const iClassBytes = Buffer.from(instance.constructor.toString());
-        const iClassVersion = createHash("md5").update(iClassBytes).digest("hex");
+        const iClassVersion = md5Signature(instance.constructor.toString());
         throw Error(`Instance of class '${instance.constructor.name}(classVersion: ${iClassVersion})' does not match classVersion '${obj.classVersion}'`);
     }
     static overwriteVersion(obj, instance) {
-        const classBytes = Buffer.from(instance.constructor.toString());
-        const classVersion = createHash("md5").update(classBytes).digest("hex");
+        const classVersion = md5Signature(instance.constructor.toString());
         log(`Solved classVersion conflict by overwriting it. (${obj.classVersion})->(${classVersion})`);
         obj.classVersion = classVersion;
         return obj;
     }
     static overwriteAll(obj, instance) {
-        const classBytes = Buffer.from(instance.constructor.toString());
-        const classVersion = createHash("md5").update(classBytes).digest("hex");
+        const classVersion = md5Signature(instance.constructor.toString());
         log(`Solved classVersion conflict by overwriting all of the data. (${obj.classVersion})->(${classVersion})`);
         obj.classVersion = classVersion;
         obj.data = instance.serialize();
         return obj;
+    }
+}
+export class ChestMigration {
+    versionMap = new Map();
+    addTarget(fromVersion, toVersion, solve) {
+        if (this.versionMap.has(fromVersion))
+            throw Error(`Mapping from version ${fromVersion} already exists`);
+        this.versionMap.set(fromVersion, { toVersion, solve });
+    }
+    buildSolver() {
+        const versionMap = this.versionMap;
+        function solver(obj, instance) {
+            const targetVersion = md5Signature(instance.constructor.toString());
+            let { data, classVersion } = obj;
+            log(`Attempting to migrate from ${classVersion} to ${targetVersion}`);
+            while (targetVersion !== classVersion) {
+                if (!versionMap.has(classVersion))
+                    throw Error(`Migration failed. Could to find solver for version ${classVersion}`);
+                const { solve, toVersion } = versionMap.get(classVersion);
+                log(`Migrating from version ${classVersion} to ${toVersion}`);
+                data = solve(data);
+                classVersion = toVersion;
+            }
+            log(`Migration to version ${targetVersion} successful`);
+            obj.data = data;
+            obj.classVersion = classVersion;
+            return obj;
+        }
+        return solver;
     }
 }

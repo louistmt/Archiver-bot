@@ -1,5 +1,6 @@
 # Archiver-bot
-A discord bot used to move messages from a server to another for archival purposes.
+A discord bot used to move messages from a server to another for archival purposes. This bot is still in active development
+so chances are this readme will change over time and instruction may not be 100% accurate.
 
 # Requirements
 You will need nodejs 18.12.1 or higher to run this bot (might run on versions before this one but I didn't test that).

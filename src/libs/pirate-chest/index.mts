@@ -31,8 +31,7 @@ export class PirateChest<T extends ISerializable> implements IPirateChest<T> {
 
     private load() {
         const instance = this.instance
-        const iClassBytes = Buffer.from(instance.constructor.toString())
-        const iClassVersion = createHash("md5").update(iClassBytes).digest("hex")
+        const iClassVersion = md5Signature(instance.constructor.toString())
         let obj: Serialized;
 
         if (fileExists(this.filePath)) {
@@ -53,8 +52,7 @@ export class PirateChest<T extends ISerializable> implements IPirateChest<T> {
 
     save() {
         const instance = this.instance
-        const classBytes = Buffer.from(instance.constructor.toString())
-        const classVersion = createHash("md5").update(classBytes).digest("hex")
+        const classVersion = md5Signature(instance.constructor.toString())
         const obj: Serialized = {classVersion, data: instance.serialize()} 
         writeJSONFile(this.filePath, obj)
     }
@@ -87,22 +85,19 @@ export class DefaultSerialization implements ISerializable {
 
 export class DefaultSolveStrategies {
     static throwError<T extends ISerializable>(obj: Serialized, instance: T): Serialized {
-        const iClassBytes = Buffer.from(instance.constructor.toString())
-        const iClassVersion = createHash("md5").update(iClassBytes).digest("hex")
+        const iClassVersion = md5Signature(instance.constructor.toString())
         throw Error(`Instance of class '${instance.constructor.name}(classVersion: ${iClassVersion})' does not match classVersion '${obj.classVersion}'`);
     }
 
     static overwriteVersion<T extends ISerializable>(obj: Serialized, instance: T): Serialized {
-        const classBytes = Buffer.from(instance.constructor.toString())
-        const classVersion = createHash("md5").update(classBytes).digest("hex")
+        const classVersion = md5Signature(instance.constructor.toString())
         log(`Solved classVersion conflict by overwriting it. (${obj.classVersion})->(${classVersion})`);
         obj.classVersion = classVersion
         return obj
     }
 
     static overwriteAll<T extends ISerializable>(obj: Serialized, instance: T): Serialized {
-        const classBytes = Buffer.from(instance.constructor.toString())
-        const classVersion = createHash("md5").update(classBytes).digest("hex")
+        const classVersion = md5Signature(instance.constructor.toString())
         log(`Solved classVersion conflict by overwriting all of the data. (${obj.classVersion})->(${classVersion})`);
         obj.classVersion = classVersion
         obj.data = instance.serialize()

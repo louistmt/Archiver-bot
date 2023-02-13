@@ -1,7 +1,7 @@
 import { IPirateChest, ISerializable, Serialized, SolveStrategy } from "./types.mjs";
 import { createHash } from "node:crypto";
 import { fileExists, preLogs, readJSONFile, writeJSONFile } from "../../utils.mjs";
-import { JSONObject } from "../common.mjs";
+import { JSONObject, md5Signature } from "../common.mjs";
 
 const {log} = preLogs("PirateChest");
 
@@ -109,3 +109,53 @@ export class DefaultSolveStrategies {
         return obj
     }
 }
+
+type SolveFn = (data: JSONObject) => JSONObject;
+type VersionMapEntry = {toVersion: string, solve: SolveFn} 
+
+export class ChestMigration<T extends ISerializable> {
+    private versionMap: Map<string, VersionMapEntry> = new Map();
+
+    addTarget(fromVersion: string, toVersion: string, solve: SolveFn) {
+        if (this.versionMap.has(fromVersion)) throw Error(`Mapping from version ${fromVersion} already exists`);
+        this.versionMap.set(fromVersion, {toVersion, solve});
+    }
+
+    buildSolver(): SolveStrategy<T> {
+        const versionMap = this.versionMap;
+
+        function solver(obj: Serialized, instance: T): Serialized {
+            const targetVersion = md5Signature(instance.constructor.toString())
+            let {data, classVersion} = obj;
+
+            while (targetVersion !== classVersion) {
+                if (!versionMap.has(classVersion)) throw Error(`Migration failed. Could to find solver for version ${classVersion}`);
+                const {solve, toVersion} = versionMap.get(classVersion);
+                data = solve(data);
+                classVersion = toVersion;
+            }
+
+            obj.data = data;
+            obj.classVersion = classVersion;
+            return obj;
+        }
+
+        return solver;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

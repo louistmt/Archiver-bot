@@ -27,7 +27,7 @@ You will need nodejs 18.12.1 or higher to run this bot (might run on versions be
 - Run the command `npm start`.
 
 # Updating the Bot
-The bot is still under active development so new features maybe added and bug fixes. When this happens, if you want the updates, the files you need are the ones in `dist/` directory and the `package.json` and `package-lock.json`. Once you have retrieved them:
+The bot is still under active development so new features maybe added and bug fixes. When this happens, if you want the updates, the files you need are the ones in `dist/` and `scripts/` directories and the `package.json` and `package-lock.json`. Once you have retrieved them:
 
 - Open a terminal and navigate to `your-directory/Archiver-bot`.
 - Run the command `npm install` and `npm run deploycmds` and that should be it.

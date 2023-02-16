@@ -48,7 +48,8 @@ export class PirateChest<T extends ISerializable> implements IPirateChest<T> {
     }
 
     private solveConflict(obj: Serialized, instance: T): Serialized {
-        if (obj.classVersion === instance.version) throw Error("The class signature does not match however both have the same version. Report this bug to the developer");
+        const classVersion = typeof obj.classVersion === 'string' ? 1 : obj.classVersion;
+        if (classVersion === instance.version) throw Error("The class signature does not match however both have the same version. Report this bug to the developer");
         const solvedObj = this.conflictSolver(obj, instance)
         writeJSONFile(this.filePath, solvedObj)
         return solvedObj

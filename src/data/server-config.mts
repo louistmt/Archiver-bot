@@ -7,6 +7,7 @@ type ServerConfig = {
 };
 
 export default class ServersConfig implements ISerializable {
+    version: number = 2;
     configMap: Map<string, ServerConfig> = new Map();
 
     getOrCreate(serverId: string): ServerConfig {

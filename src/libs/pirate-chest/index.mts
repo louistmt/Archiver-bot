@@ -1,5 +1,4 @@
 import { IPirateChest, ISerializable, Serialized, SolveStrategy } from "./types.mjs";
-import { createHash } from "node:crypto";
 import { fileExists, preLogs, readJSONFile, writeJSONFile } from "../../utils.mjs";
 import { JSONObject, md5Signature } from "../common.mjs";
 

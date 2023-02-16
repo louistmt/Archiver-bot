@@ -19,45 +19,33 @@ export class PirateChest {
     }
     load() {
         const instance = this.instance;
-        const iClassVersion = md5Signature(instance.constructor.toString());
+        const iClassVersion = instance.version;
+        const iClassSignature = md5Signature(instance.constructor.toString());
         let obj;
         if (fileExists(this.filePath)) {
             obj = readJSONFile(this.filePath);
         }
         else {
-            obj = { classVersion: iClassVersion, data: {} };
+            obj = { classVersion: iClassVersion, classSignature: iClassSignature, data: {} };
         }
-        if (obj.classVersion !== iClassVersion) {
-            let solvedObj = this.conflictSolver(obj, instance);
-            writeJSONFile(this.filePath, solvedObj);
-            obj = solvedObj;
-        }
+        if (obj.classSignature !== iClassSignature)
+            obj = this.solveConflict(obj, instance);
         instance.load(obj.data);
         return instance;
     }
+    solveConflict(obj, instance) {
+        obj.classVersion = typeof obj.classVersion === 'string' ? 1 : obj.classVersion;
+        if (obj.classVersion === instance.version)
+            throw Error("The class signature does not match however both have the same version. Report this bug to the developer");
+        const solvedObj = this.conflictSolver(obj, instance);
+        writeJSONFile(this.filePath, solvedObj);
+        return solvedObj;
+    }
     save() {
         const instance = this.instance;
-        const classVersion = md5Signature(instance.constructor.toString());
-        const obj = { classVersion, data: instance.serialize() };
+        const classSignature = md5Signature(instance.constructor.toString());
+        const obj = { classVersion: instance.version, classSignature, data: instance.serialize() };
         writeJSONFile(this.filePath, obj);
-    }
-}
-export class DefaultSerialization {
-    serialize() {
-        return JSON.parse(JSON.stringify(this));
-    }
-    load(data) {
-        for (let [key, value] of Object.entries(data)) {
-            this[key] = value;
-        }
-    }
-    static serialize(instance) {
-        return JSON.parse(JSON.stringify(instance));
-    }
-    static load(instance, data) {
-        for (let [key, value] of Object.entries(data)) {
-            instance[key] = value;
-        }
     }
 }
 export class DefaultSolveStrategies {
@@ -66,15 +54,17 @@ export class DefaultSolveStrategies {
         throw Error(`Instance of class '${instance.constructor.name}(classVersion: ${iClassVersion})' does not match classVersion '${obj.classVersion}'`);
     }
     static overwriteVersion(obj, instance) {
-        const classVersion = md5Signature(instance.constructor.toString());
-        log(`Solved classVersion conflict by overwriting it. (${obj.classVersion})->(${classVersion})`);
-        obj.classVersion = classVersion;
+        const classSignature = md5Signature(instance.constructor.toString());
+        log(`Solved classVersion conflict by overwriting it. (${obj.classVersion})->(${instance.version})`);
+        obj.classVersion = instance.version;
+        obj.classSignature = classSignature;
         return obj;
     }
     static overwriteAll(obj, instance) {
-        const classVersion = md5Signature(instance.constructor.toString());
-        log(`Solved classVersion conflict by overwriting all of the data. (${obj.classVersion})->(${classVersion})`);
-        obj.classVersion = classVersion;
+        const classSignature = md5Signature(instance.constructor.toString());
+        log(`Solved classVersion conflict by overwriting all of the data. (${obj.classVersion})->(${instance.version})`);
+        obj.classVersion = instance.version;
+        obj.classSignature = classSignature;
         obj.data = instance.serialize();
         return obj;
     }
@@ -89,7 +79,8 @@ export class ChestMigration {
     buildSolver() {
         const versionMap = this.versionMap;
         function solver(obj, instance) {
-            const targetVersion = md5Signature(instance.constructor.toString());
+            const targetSignature = md5Signature(instance.constructor.toString());
+            const targetVersion = instance.version;
             let { data, classVersion } = obj;
             log(`Attempting to migrate from ${classVersion} to ${targetVersion}`);
             while (targetVersion !== classVersion) {
@@ -102,6 +93,7 @@ export class ChestMigration {
             }
             log(`Migration to version ${targetVersion} successful`);
             obj.data = data;
+            obj.classSignature = targetSignature;
             obj.classVersion = classVersion;
             return obj;
         }

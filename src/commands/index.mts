@@ -4,13 +4,15 @@ import cancelCmd from "./cmd-cancel.mjs";
 import catCmd from "./cmd-cat.mjs";
 import configCmd from "./config/index.mjs";
 import jobsCmd from "./cmd-jobs.mjs";
+import exportCmd from "./export/index.mjs";
 
 export const execsMap = produceExecsMap(
     archiveCmd,
     cancelCmd,
     catCmd,
     configCmd,
-    jobsCmd
+    jobsCmd,
+    exportCmd
 );
 
 export const definitionsList = produceDefinitionList(
@@ -18,5 +20,6 @@ export const definitionsList = produceDefinitionList(
     cancelCmd,
     catCmd,
     configCmd,
-    jobsCmd
+    jobsCmd,
+    exportCmd
 );

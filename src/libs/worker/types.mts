@@ -38,6 +38,7 @@ export enum JobState {
 }
 
 export interface IJob<T extends JSONObject> {
+    readonly tag: string
     readonly name: string
     readonly data: T
     readonly err: any
@@ -64,10 +65,12 @@ export interface ITaskErrorHandler<K, T extends JSONObject, R extends JSONObject
     handle(job: IJob<T>): Promise<IJob<JSONObject>>
 }
 
+export type WorkFunction<T extends JSONObject, R extends JSONObject> = (job: IJob<T>) => Promise<IJob<R>>
+
 export interface ITask<T extends JSONObject, R extends JSONObject> {
     name: string;
     
-    work(workFn: (job: IJob<T>) => Promise<IJob<R>>)
+    work(workFn: WorkFunction<T, R>)
     errors<K>(): ITaskErrorHandler<K, T, R>
 
     doJob(job: IJob<JSONObject>): Promise<IJob<JSONObject>>

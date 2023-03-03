@@ -2,6 +2,11 @@ import { JSONObject } from "../common.mjs";
 import { IJob, JobState } from "./types.mjs";
 
 type JobOptions<T extends JSONObject> = {
+    /**
+     * Used to distinguish jobs may have similar procedures but
+     * require slight tweaks
+     */
+    tag?: string
     name?: string
     data?: T
     err?: any
@@ -10,6 +15,11 @@ type JobOptions<T extends JSONObject> = {
 }
 
 export default class Job<T extends JSONObject> implements IJob<T> {
+    /**
+     * Used to distinguish jobs may have similar procedures but
+     * require slight tweaks
+     */
+    tag: string;
     name: string;
     data: T;
     err: any;
@@ -18,9 +28,10 @@ export default class Job<T extends JSONObject> implements IJob<T> {
 
     private constructor({
         name, data,
-        err = undefined, fatalErr = undefined,
+        err = undefined, fatalErr = undefined, tag = "",
         state = JobState.OKAY
     }: JobOptions<T>) {
+        this.tag = tag;
         this.name = name;
         this.data = data;
         this.err = err;
@@ -28,11 +39,12 @@ export default class Job<T extends JSONObject> implements IJob<T> {
         this.state = state;
     }
 
-    static create<T extends JSONObject>(name: string, data: T, state?: JobState): IJob<T> {
-        return new Job({ name, data, state });
+    static create<T extends JSONObject>(name: string, data: T, tag?:string, state?: JobState): IJob<T> {
+        return new Job({ name, data, tag, state });
     }
 
-    private updateState<R extends JSONObject>({ name, data, err, fatalErr, state }: JobOptions<R>): Job<R> {
+    private updateState<R extends JSONObject>({ tag, name, data, err, fatalErr, state }: JobOptions<R>): Job<R> {
+        this.tag = tag ?? this.tag;
         this.name = name ?? this.name;
         this.data = data as any ?? this.data;
         this.err = err ?? this.err;

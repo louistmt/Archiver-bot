@@ -1,5 +1,5 @@
 import TaskErrorHandler from "./TaskErrorHandler.mjs";
-import { IJob, ITask, ITaskErrorHandler, JobState } from "./types.mjs";
+import { IJob, ITask, ITaskErrorHandler, JobState, WorkFunction } from "./types.mjs";
 import { JSONObject } from "../common.mjs";
 
 export default class Task<T extends JSONObject, R extends JSONObject> implements ITask<T, R> {
@@ -15,7 +15,7 @@ export default class Task<T extends JSONObject, R extends JSONObject> implements
         return new Task(name);
     }
 
-    work(workFn: (job: IJob<T>) => Promise<IJob<R>>) {
+    work(workFn: WorkFunction<T, R>) {
         this.workFn = workFn;
     }
 

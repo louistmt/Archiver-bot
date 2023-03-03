@@ -8,8 +8,7 @@ export type ExportJob = {
     srcChannelId: string;
     srcChannelName: string;
 
-    destinationChannel?: string;
-    destinationUser?: string;
+    destChannelId?: string;
 };
 
 export type SendJob = {
@@ -18,6 +17,5 @@ export type SendJob = {
     fileName: string;
     messages: RpMessage[];
 
-    destinationChannelId?: string;
-    destinationUserId?: string;
+    destChannelId?: string;
 };

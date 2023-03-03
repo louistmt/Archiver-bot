@@ -17,14 +17,14 @@ import client from "../../client.mjs";
  */
 
 async function sendJsonFile(job: IJob<SendJob>): Promise<IJob<SendJob>> {
-    const { srcChannelName, fileName, messages, destinationChannelId } = job.data;
+    const { srcChannelName, fileName, messages, destChannelId } = job.data;
     const json = {
         "name": capitalize(srcChannelName.replaceAll("-", " ")),
         "messages": messages
     };
     const jsonBuffer = Buffer.from(JSON.stringify(json));
     const attachment = new MessageAttachment(jsonBuffer, fileName)
-    const channel = await client.channels.fetch(destinationChannelId)
+    const channel = await client.channels.fetch(destChannelId)
 
     if (channel.isText()) {
         await channel.send({files: [attachment]})

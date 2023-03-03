@@ -10,6 +10,16 @@ export function multiline(...lines) {
 }
 
 /**
+ * Capitalizes the first letter of a string
+ * @param str The string to capitalize
+ */
+export function capitalize(str: string): string {
+    const characters = str.split("");
+    characters[0].toUpperCase();
+    return characters.join("");
+}
+
+/**
  * Returns a promise that solves after the specified amount of time.
  * @param {number} duration Time in miliseconds.
  * @returns 

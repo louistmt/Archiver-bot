@@ -14,18 +14,42 @@ import client from "../../client.mjs";
  * }
  */
 async function sendJsonFile(job) {
-    const { srcChannelName, fileName, messages, destinationChannelId } = job.data;
+    const { srcChannelName, fileName, messages, destChannelId } = job.data;
     const json = {
         "name": capitalize(srcChannelName.replaceAll("-", " ")),
         "messages": messages
     };
     const jsonBuffer = Buffer.from(JSON.stringify(json));
     const attachment = new MessageAttachment(jsonBuffer, fileName);
-    const channel = await client.channels.fetch(destinationChannelId);
+    const channel = await client.channels.fetch(destChannelId);
     if (channel.isText()) {
         await channel.send({ files: [attachment] });
     }
+    else {
+        throw Error(`Channel ${channel.name} is not a text channel`);
+    }
     return job;
 }
-const send = createMultiTagFunction({ tag: "json", fn: sendJsonFile });
+const discordCdnUrl = "https://cdn.discordapp.com/attachments/";
+const replitUrl = "https://archiver-viewer.luisferreira.repl.co/viewer";
+async function sendWebPage(job) {
+    const { srcChannelName, fileName, messages, destChannelId } = job.data;
+    const json = {
+        "name": capitalize(srcChannelName.replaceAll("-", " ")),
+        "messages": messages
+    };
+    const jsonBuffer = Buffer.from(JSON.stringify(json));
+    const attachment = new MessageAttachment(jsonBuffer, fileName);
+    const channel = await client.channels.fetch(destChannelId);
+    if (channel.isText()) {
+        const msg = await channel.send({ files: [attachment] });
+        const fileUrl = [...msg.attachments.values()][0].url.replace(discordCdnUrl, "");
+        await channel.send(`${replitUrl}/${fileUrl}`);
+    }
+    else {
+        throw Error(`Channel ${channel.name} is not a text channel`);
+    }
+    return job;
+}
+const send = createMultiTagFunction({ tag: "json", fn: sendJsonFile }, { tag: "webpage", fn: sendWebPage });
 export default send;

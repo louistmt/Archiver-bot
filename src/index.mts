@@ -32,8 +32,6 @@ process.on("SIGINT", singleCallFix(() => {
     shutdown()
 }));
 
-startup();
-
 async function shutdown() {
     await Archiver.shutdown()
     await Exporter.shutdown()
@@ -44,7 +42,7 @@ async function shutdown() {
     process.exit(0)
 }
 
-function startup() {
+async function startup() {
     client.on("interactionCreate", async interaction => {
         if (!interaction.isCommand()) return
         const execute = execsMap.get(interaction.commandName)
@@ -61,4 +59,9 @@ function startup() {
             await interaction.reply(`There was an error while handling this command.`)
         }
     });
+
+    log("Starting up client");
+    await client.login(Config.token);
 }
+
+await startup();

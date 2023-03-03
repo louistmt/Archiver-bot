@@ -1,21 +1,28 @@
 import { JobState } from "./types.mjs";
 export default class Job {
+    /**
+     * Used to distinguish jobs may have similar procedures but
+     * require slight tweaks
+     */
+    tag;
     name;
     data;
     err;
     fatalErr;
     state;
-    constructor({ name, data, err = undefined, fatalErr = undefined, state = JobState.OKAY }) {
+    constructor({ name, data, err = undefined, fatalErr = undefined, tag = "", state = JobState.OKAY }) {
+        this.tag = tag;
         this.name = name;
         this.data = data;
         this.err = err;
         this.fatalErr = fatalErr;
         this.state = state;
     }
-    static create(name, data, state) {
-        return new Job({ name, data, state });
+    static create(name, data, tag, state) {
+        return new Job({ name, data, tag, state });
     }
-    updateState({ name, data, err, fatalErr, state }) {
+    updateState({ tag, name, data, err, fatalErr, state }) {
+        this.tag = tag ?? this.tag;
         this.name = name ?? this.name;
         this.data = data ?? this.data;
         this.err = err ?? this.err;

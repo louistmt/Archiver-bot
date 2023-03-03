@@ -85,7 +85,7 @@ export interface IWorker<T extends JSONObject> {
 
     tasks(): ITaskSequence<T>
 
-    enqueueJob(job: IJob<T>)
+    enqueueJob(job: IJob<T>): Promise<void>
     cancelJob(name: string)
 
     shutdown(): Promise<void>

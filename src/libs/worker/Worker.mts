@@ -41,17 +41,19 @@ export default class Worker<T extends JSONObject> implements IWorker<T> {
         return TaskSequence.create<T>(this.taskList);
     }
 
-    enqueueJob(job: IJob<T>) {
+    async enqueueJob(job: IJob<T>) {
         if (this.state === WorkerState.SHUTDOWN) return;
         if (this.taskList.length === 0) throw "No tasks added to work on this job. Make sure you setup your worker before queueing jobs";
         if (this.jobsList.includes(job)) throw "Adding the same Job reference twice is not allowed.";
 
         this.jobsList.push(job);
 
-        if (this.state === WorkerState.WORKING) return;
+        if (this.state !== WorkerState.WORKING) {
+            this.state = WorkerState.WORKING;
+            this.workPromise = this.doJobs();
+        }
 
-        this.state = WorkerState.WORKING;
-        this.workPromise = this.doJobs();
+        await this.workPromise;
     }
 
     async doJobs() {

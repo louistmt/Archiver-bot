@@ -1,4 +1,5 @@
 export default class ServersConfig {
+    version = 2;
     configMap = new Map();
     getOrCreate(serverId) {
         if (!this.configMap.has(serverId))

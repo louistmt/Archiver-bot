@@ -75,9 +75,9 @@ export default class Job<T extends JSONObject> implements IJob<T> {
     }
 
     error(err: any): IJob<T> {
-        let { name, data } = this;
+        let { name, data, tag } = this;
         if (this.isStateImmutable()) return this.updateState<T>({ err });
-        return new Job({ name, data, err, state: JobState.ERROR });
+        return new Job({ name, data, tag, err, state: JobState.ERROR });
     }
 
     fatal(err: any): IJob<T> {
@@ -85,27 +85,28 @@ export default class Job<T extends JSONObject> implements IJob<T> {
     }
 
     repeatTask(data: T): IJob<T> {
-        const { name, err } = this;
+        const { name, err, tag } = this;
         if (this.isStateImmutable()) return this.updateState<T>({data});
-        return new Job({ name, data, err, state: JobState.REPEAT_TASK });
+        return new Job({ name, data, tag, err, state: JobState.REPEAT_TASK });
     }
 
     skipTask<R extends JSONObject>(data: R): IJob<R> {
-        const { name, err } = this;
+        const { name, err, tag } = this;
         if (this.isStateImmutable()) return this.updateState<R>({data});
-        return new Job<R>({ name, data, err, state: JobState.SKIP_TASK });
+        return new Job<R>({ name, data, tag, err, state: JobState.SKIP_TASK });
     }
 
     from<R extends JSONObject>(data: R): IJob<R> {
-        const { name, err, fatalErr, state } = this;
-        return new Job({ name, data, err, fatalErr, state });
+        const { name, err, tag, fatalErr, state } = this;
+        return new Job({ name, data, tag, err, fatalErr, state });
     }
 
     serialize(): JSONObject {
         return {
             name: this.name,
             data: this.data,
-            state: this.state
+            state: this.state,
+            tag: this.tag
         }
     }
 

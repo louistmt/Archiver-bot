@@ -1,10 +1,9 @@
-import { Client } from "discord.js";
+import client from "./client.mjs";
 import Archiver from "./workers/archiver.mjs";
 import Config from "./config.mjs";
 import { execsMap } from "./commands/index.mjs";
 import { singleCallFix, preLogs } from "./utils.mjs";
 import { ServersConfigChest } from "./data/index.mjs";
-let client = undefined;
 const { log, error } = preLogs("Client");
 // Logging unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
@@ -29,30 +28,10 @@ async function shutdown() {
     await Archiver.shutdown();
     Archiver.save(Config.paths.archiverState);
     ServersConfigChest.save();
-    if (client != undefined) {
-        client.destroy();
-        client = undefined;
-    }
+    client.destroy();
     process.exit(0);
 }
 function startup() {
-    if (client !== undefined)
-        return;
-    log("Starting up client");
-    client = new Client(Config.clientOptions);
-    client.on("shardDisconnect", () => {
-        log("Lost connection");
-    });
-    client.on("shardError", error);
-    client.on("shardReady", () => {
-        log("Connection Ready");
-    });
-    client.on("shardReconnecting", () => {
-        log("Reconnecting shard");
-    });
-    client.on("shardResume", () => {
-        log("Connection resumed");
-    });
     client.on("interactionCreate", async (interaction) => {
         if (!interaction.isCommand())
             return;
@@ -69,10 +48,4 @@ function startup() {
             await interaction.reply(`There was an error while handling this command.`);
         }
     });
-    client.on("error", error);
-    client.once("ready", () => {
-        log("Bot is online");
-        client.user.setActivity("the servant", { type: "PLAYING" });
-    });
-    client.login(Config.token);
 }

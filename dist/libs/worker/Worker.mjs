@@ -33,7 +33,7 @@ export default class Worker {
     tasks() {
         return TaskSequence.create(this.taskList);
     }
-    enqueueJob(job) {
+    async enqueueJob(job) {
         if (this.state === WorkerState.SHUTDOWN)
             return;
         if (this.taskList.length === 0)
@@ -41,10 +41,11 @@ export default class Worker {
         if (this.jobsList.includes(job))
             throw "Adding the same Job reference twice is not allowed.";
         this.jobsList.push(job);
-        if (this.state === WorkerState.WORKING)
-            return;
-        this.state = WorkerState.WORKING;
-        this.workPromise = this.doJobs();
+        if (this.state !== WorkerState.WORKING) {
+            this.state = WorkerState.WORKING;
+            this.workPromise = this.doJobs();
+        }
+        await this.workPromise;
     }
     async doJobs() {
         while (this.jobsList.length > 0 && this.state !== WorkerState.SHUTDOWN) {

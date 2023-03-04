@@ -51,35 +51,36 @@ export default class Job {
         return this;
     }
     error(err) {
-        let { name, data } = this;
+        let { name, data, tag } = this;
         if (this.isStateImmutable())
             return this.updateState({ err });
-        return new Job({ name, data, err, state: JobState.ERROR });
+        return new Job({ name, data, tag, err, state: JobState.ERROR });
     }
     fatal(err) {
         return this.updateState({ fatalErr: err, state: JobState.FATAL_ERROR });
     }
     repeatTask(data) {
-        const { name, err } = this;
+        const { name, err, tag } = this;
         if (this.isStateImmutable())
             return this.updateState({ data });
-        return new Job({ name, data, err, state: JobState.REPEAT_TASK });
+        return new Job({ name, data, tag, err, state: JobState.REPEAT_TASK });
     }
     skipTask(data) {
-        const { name, err } = this;
+        const { name, err, tag } = this;
         if (this.isStateImmutable())
             return this.updateState({ data });
-        return new Job({ name, data, err, state: JobState.SKIP_TASK });
+        return new Job({ name, data, tag, err, state: JobState.SKIP_TASK });
     }
     from(data) {
-        const { name, err, fatalErr, state } = this;
-        return new Job({ name, data, err, fatalErr, state });
+        const { name, err, tag, fatalErr, state } = this;
+        return new Job({ name, data, tag, err, fatalErr, state });
     }
     serialize() {
         return {
             name: this.name,
             data: this.data,
-            state: this.state
+            state: this.state,
+            tag: this.tag
         };
     }
 }

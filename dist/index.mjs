@@ -1,5 +1,6 @@
 import client from "./client.mjs";
 import Archiver from "./workers/archiver.mjs";
+import Exporter from "./workers/exporter/exporter.mjs";
 import Config from "./config.mjs";
 import { execsMap } from "./commands/index.mjs";
 import { singleCallFix, preLogs } from "./utils.mjs";
@@ -23,15 +24,16 @@ process.on("SIGINT", singleCallFix(() => {
     log("Bot is exiting");
     shutdown();
 }));
-startup();
 async function shutdown() {
     await Archiver.shutdown();
+    await Exporter.shutdown();
     Archiver.save(Config.paths.archiverState);
+    Exporter.save(Config.paths.exporterState);
     ServersConfigChest.save();
     client.destroy();
     process.exit(0);
 }
-function startup() {
+async function startup() {
     client.on("interactionCreate", async (interaction) => {
         if (!interaction.isCommand())
             return;
@@ -48,4 +50,7 @@ function startup() {
             await interaction.reply(`There was an error while handling this command.`);
         }
     });
+    log("Starting up client");
+    await client.login(Config.token);
 }
+await startup();

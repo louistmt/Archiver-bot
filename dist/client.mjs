@@ -21,6 +21,4 @@ client.on("shardReconnecting", () => {
 client.on("shardResume", () => {
     log("Connection resumed");
 });
-log("Starting up client");
-await client.login(Config.token);
 export default client;

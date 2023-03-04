@@ -15,7 +15,7 @@ export function multiline(...lines) {
  */
 export function capitalize(str: string): string {
     const characters = str.split("");
-    characters[0].toUpperCase();
+    characters[0] = characters[0].toUpperCase();
     return characters.join("");
 }
 

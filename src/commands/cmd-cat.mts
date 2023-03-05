@@ -6,7 +6,7 @@ import Config from "../config.mjs";
 import { retrieveArchiveData } from "../api/archival.mjs";
 import { createChannel } from "../api/channels.mjs";
 import { ServersConfigChest } from "../data/index.mjs";
-import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10.mjs";
+import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10";
 
 
 const serversConfig = ServersConfigChest.get();

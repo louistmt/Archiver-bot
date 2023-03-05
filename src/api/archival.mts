@@ -5,8 +5,9 @@
 import * as ChannelsAPI from "./channels.mjs";
 import * as WebhooksAPI from "./webhooks.mjs";
 import { avatarHashToUrl } from "../utils.mjs";
-import { ChannelType } from "discord-api-types/v10.js"
-import type { APITextChannel, APIGuildCategoryChannel } from "discord-api-types/v10.js";
+
+import { ChannelType } from "discord-api-types/v10"
+import type { APITextChannel, APIGuildCategoryChannel } from "discord-api-types/v10";
 
 const ARCHIVE_LIMIT = 500;
 const CATEGORY_LIMIT = 50;

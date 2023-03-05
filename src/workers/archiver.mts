@@ -114,7 +114,6 @@ sendRpMsgsTask.work(async (job) => {
 
     while (msgs.length > 0 && job.state !== JobState.CANCELED && job.state !== JobState.WORKER_SHUTDOWN) {
         const { avatarUrl, content, username } = msgs[0];
-        await delay(3 * 1000);
         await postMessageToWebhook(webhookId, webhookToken, avatarUrl, username, content);
 
         msgs.shift();

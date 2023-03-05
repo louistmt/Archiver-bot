@@ -1,6 +1,7 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import type { APIWebhook, APIMessage } from "discord-api-types/v10";
+import { delay } from "../utils.mjs";
  
 import Config from "../config.mjs";
 
@@ -40,6 +41,7 @@ export async function postMessageToWebhook(
         content: content
     };
 
+    await delay(3 * 1000);
     return await rest.post(Routes.webhook(webhookId, weebhookToken), {query, body}) as APIMessage;
 }
 

@@ -3,10 +3,10 @@
  * are composed of several subcalls
  */
 import * as ChannelsAPI from "./channels.mjs";
-import { ChannelTypes } from "./channels.mjs";
 import * as WebhooksAPI from "./webhooks.mjs";
 import { avatarHashToUrl } from "../utils.mjs";
-import type { APITextChannel } from "discord-api-types/v10.js";
+import { ChannelType } from "discord-api-types/v10.js"
+import type { APITextChannel, APIGuildCategoryChannel } from "discord-api-types/v10.js";
 
 const ARCHIVE_LIMIT = 500;
 const CATEGORY_LIMIT = 50;
@@ -30,6 +30,56 @@ export class ArchivalError extends Error {
     }
 }
 
+class ServerChannelsInfo {
+    /**
+     * Total number of channes in the server
+     */
+    channelCount: number = 0;
+
+    /**
+     * A Mapping from category names to category ids.
+     * If there are more than one category with the same name,
+     * the last scanned category will be the one mapped.
+     */
+    catNamesIds: Map<string, string> = new Map();
+
+    /**
+     * Maps each text channel that has a category
+     * to its category.
+     */
+    catTextChannels: Map<string, APITextChannel[]> = new Map();
+
+    /**
+     * Maps of each category per id
+     */
+    catChannels: Map<string, APIGuildCategoryChannel> = new Map();
+}
+
+export async function retrieveServerInfo(guildId: string): Promise<ServerChannelsInfo> {
+    const serverInfo = new ServerChannelsInfo();
+
+    const channels = await ChannelsAPI.getChannels(guildId);
+    const textChannels = channels.filter((channel) => channel.type === ChannelType.GuildText) as APITextChannel[];
+    const categoryChannels = channels.filter((channel) => channel.type === ChannelType.GuildCategory) as APIGuildCategoryChannel[];
+
+    
+    serverInfo.channelCount = channels.length;
+    textChannels.forEach((channel) => {
+        if (!channel.parent_id) return;
+
+        if (!serverInfo.catTextChannels.has(channel.parent_id))
+            serverInfo.catTextChannels.set(channel.parent_id, []);
+        
+        serverInfo.catTextChannels.get(channel.parent_id).push(channel)
+    });
+    categoryChannels.forEach((channel) => {
+        serverInfo.catChannels.set(channel.id, channel)
+        serverInfo.catNamesIds.set(channel.name, channel.id)
+    });
+
+    return serverInfo
+}
+
 /**
  * Retriveves and parses the Archive Data into a format
  * @param guildId
@@ -38,8 +88,8 @@ export class ArchivalError extends Error {
 export async function retrieveArchiveData(guildId: string) {
 
     const channels = await ChannelsAPI.getChannels(guildId);
-    const catData = channels.filter((channel) => channel.type === ChannelTypes.CATEGORY);
-    const chaData = channels.filter((channel) => channel.type === ChannelTypes.TEXT);
+    const catData = channels.filter((channel) => channel.type === ChannelType.GuildCategory);
+    const chaData = channels.filter((channel) => channel.type === ChannelType.GuildText);
 
     
     const catIdsNames: Map<string, string> = new Map();
@@ -97,7 +147,7 @@ export async function createArchiveChannel(guildId: string, categoryName: string
         throw new ArchivalError(ArchivalError.CATEGORY_FULL, `Category "${categoryName}" is full`);
 
     const categoryId = archiveServer.catNamesIds.get(categoryName);
-    const channel = await ChannelsAPI.createChannel(guildId, channelName, ChannelTypes.TEXT, categoryId);
+    const channel = await ChannelsAPI.createChannel(guildId, channelName, ChannelType.GuildText, categoryId);
     const channelId = channel.id;
 
     const webhook = await WebhooksAPI.createWebhook(channelId, channel.name);

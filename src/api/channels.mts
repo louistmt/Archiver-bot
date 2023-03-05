@@ -4,10 +4,32 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { delay } from "../utils.mjs";
-import type { APIChannel, APIMessage } from "discord-api-types/v10";
+import { APIMessage, ChannelType } from "discord-api-types/v10";
+import type { 
+    APIChannel,
+    APIGroupDMChannel,
+    APIDMChannel,
+    APITextChannel,
+    APINewsChannel,
+    APIVoiceChannel,
+	APIGuildCategoryChannel,
+	APIThreadChannel
+} from "discord-api-types/v10";
 
 import Config from "../config.mjs";
 import { JSONObject } from "../libs/common.mjs";
+
+type ChannelTypeMap = {
+    [ChannelType.DM]: APIDMChannel
+    [ChannelType.GroupDM]: APIGroupDMChannel,
+    [ChannelType.GuildText]: APITextChannel,
+    [ChannelType.GuildNews]: APINewsChannel,
+    [ChannelType.GuildVoice]: APIVoiceChannel,
+    [ChannelType.GuildCategory]: APIGuildCategoryChannel,
+    [ChannelType.GuildPublicThread]: APIThreadChannel
+};
+
+type PartialChannelTypes = keyof ChannelTypeMap;
 
 const timeUnit = {
     ms: 1,
@@ -16,11 +38,6 @@ const timeUnit = {
 
 const rest = new REST({ version: '10' }).setToken(Config.token);
 
-export const ChannelTypes = {
-    TEXT: 0,
-    CATEGORY: 4
-};
-
 /**
  * Wrapper to create a new channel.
  * @param guildId Id of the guild where one wishes to create the channel.
@@ -28,11 +45,11 @@ export const ChannelTypes = {
  * @param type Type of channel.
  * @param parentId Id of the parent category.
  */
-export async function createChannel(
-    guildId: string, name: string, type: number,
+export async function createChannel<K extends PartialChannelTypes>(
+    guildId: string, name: string, type_: K,
     parentId: string = undefined
-): Promise<APIChannel> {
-    const body: JSONObject = { name, type };
+): Promise<ChannelTypeMap[K]> {
+    const body: JSONObject = { name, type_ };
 
     if (parentId !== undefined) {
         body.parent_id = parentId;
@@ -41,7 +58,7 @@ export async function createChannel(
     return await rest.post(
         Routes.guildChannels(guildId),
         { body }
-    ) as APIChannel;
+    ) as ChannelTypeMap[K];
 }
 
 /**
@@ -65,12 +82,12 @@ export async function getChannel(id: string): Promise<APIChannel> {
  * @param guildId The id of the server.
  * @param type An optional parameter to filter the channels
  */
-export async function getChannels(guildId: string, type: number = undefined): Promise<APIChannel[]> {
-    const channels = await rest.get(Routes.guildChannels(guildId)) as APIChannel[];
+export async function getChannels<K extends PartialChannelTypes>(guildId: string, type: K = undefined): Promise<ChannelTypeMap[K][]> {
+    const channels = await rest.get(Routes.guildChannels(guildId)) as any[];
 
     if (type === null || type === undefined) return channels;
 
-    return channels.filter((channel) => channel.type === type);
+    return channels.filter((channel) => channel.type === type) as ChannelTypeMap[K][];
 }
 
 /**

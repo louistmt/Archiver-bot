@@ -30,7 +30,7 @@ definition.addChannelOption((option) => {
 async function execute(interaction: CommandInteraction) {
 
     const category = interaction.options.getChannel("src-category") as GuildBasedChannel
-    if (!category.isDirectory()) {
+    if (category.type !== "GUILD_CATEGORY") {
         await interaction.reply(`Channel ${(category as GuildBasedChannel).name} is not a category`);
         return;
     }

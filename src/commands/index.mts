@@ -5,6 +5,7 @@ import catCmd from "./cmd-cat.mjs";
 import configCmd from "./config/index.mjs";
 import jobsCmd from "./cmd-jobs.mjs";
 import exportCmd from "./export/index.mjs";
+import exportCatCmd from "./export-category.mjs";
 
 export const execsMap = produceExecsMap(
     archiveCmd,
@@ -12,7 +13,8 @@ export const execsMap = produceExecsMap(
     catCmd,
     configCmd,
     jobsCmd,
-    exportCmd
+    exportCmd,
+    exportCatCmd
 );
 
 export const definitionsList = produceDefinitionList(
@@ -21,5 +23,6 @@ export const definitionsList = produceDefinitionList(
     catCmd,
     configCmd,
     jobsCmd,
-    exportCmd
+    exportCmd,
+    exportCatCmd
 );

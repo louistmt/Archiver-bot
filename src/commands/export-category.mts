@@ -57,5 +57,5 @@ async function execute(interaction: CommandInteraction) {
     await interaction.reply(`Queued ${srcChannels.length} to be exported`)
 }
 
-const archiveCmd: Command = { definition, execute };
-export default archiveCmd;
+const exportCatCmd: Command = { definition, execute };
+export default exportCatCmd;

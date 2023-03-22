@@ -21,6 +21,8 @@ const Config = {
     token: process.env["DISCORD_TOKEN"],
     clientId: process.env["CLIENT_ID"],
     clientOptions: {intents: intents},
+    googleApiSecret: process.env["GOOGLE_API_SECRET"],
+    googleApiClientId: process.env["GOOGLE_API_CLIENT_ID"],
     paths,
     categoryLimit: 50,
     archiveLimit: 500

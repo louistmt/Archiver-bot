@@ -2,9 +2,9 @@ import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/b
 import { produceSubExecsMap } from "../libs/cmds.mjs";
 import Config from "../config.mjs";
 import { retrieveArchiveData } from "../api/archival.mjs";
-import { createChannel, ChannelTypes } from "../api/channels.mjs";
+import { createChannel } from "../api/channels.mjs";
 import { ServersConfigChest } from "../data/index.mjs";
-import { PermissionFlagsBits } from "discord-api-types/v9";
+import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10";
 const serversConfig = ServersConfigChest.get();
 const catAddDefinition = new SlashCommandSubcommandBuilder();
 catAddDefinition.setName("add");
@@ -29,7 +29,7 @@ async function executeCatAdd(interaction) {
         await interaction.reply(`Category ${categoryName} already exists.`);
         return;
     }
-    await createChannel(archiveServerId, categoryName, ChannelTypes.CATEGORY);
+    await createChannel(archiveServerId, categoryName, ChannelType.GuildCategory);
     await interaction.reply(`Created new category \`\`${categoryName}\`\``);
 }
 const catListDefinition = new SlashCommandSubcommandBuilder();

@@ -1,5 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
+import { delay } from "../utils.mjs";
 import Config from "../config.mjs";
 const rest = new REST({ version: '10' }).setToken(Config.token);
 /**
@@ -25,6 +26,7 @@ export async function postMessageToWebhook(webhookId, weebhookToken, avatarUrl, 
         username: username,
         content: content
     };
+    await delay(3 * 1000);
     return await rest.post(Routes.webhook(webhookId, weebhookToken), { query, body });
 }
 /**

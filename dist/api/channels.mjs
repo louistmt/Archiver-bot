@@ -4,16 +4,13 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { delay } from "../utils.mjs";
+import { ChannelType } from "discord-api-types/v10";
 import Config from "../config.mjs";
 const timeUnit = {
     ms: 1,
     s: 1000
 };
 const rest = new REST({ version: '10' }).setToken(Config.token);
-export const ChannelTypes = {
-    TEXT: 0,
-    CATEGORY: 4
-};
 /**
  * Wrapper to create a new channel.
  * @param guildId Id of the guild where one wishes to create the channel.
@@ -21,8 +18,8 @@ export const ChannelTypes = {
  * @param type Type of channel.
  * @param parentId Id of the parent category.
  */
-export async function createChannel(guildId, name, type, parentId = undefined) {
-    const body = { name, type };
+export async function createChannel(guildId, name, type_, parentId = undefined) {
+    const body = { name, type_ };
     if (parentId !== undefined) {
         body.parent_id = parentId;
     }

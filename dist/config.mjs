@@ -17,6 +17,7 @@ const Config = {
     token: process.env["DISCORD_TOKEN"],
     clientId: process.env["CLIENT_ID"],
     clientOptions: { intents: intents },
+    googleScriptId: process.env["GOOGLE_SCRIPT_ID"],
     paths,
     categoryLimit: 50,
     archiveLimit: 500

@@ -5,6 +5,9 @@ import { CommandInteraction } from "discord.js";
 import { Command } from "../libs/cmds.mjs";
 
 import Archiver, { SendRpMsgsJob } from "../workers/archiver.mjs";
+import { ServersConfigChest } from "../data/index.mjs";
+
+const serversConfig = ServersConfigChest.get();
 
 const definition = new SlashCommandBuilder()
 definition.setName("jobs")
@@ -12,9 +15,7 @@ definition.setDescription("Prints info about the archival jobs in queue")
 definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 definition.setDMPermission(false)
 
-async function execute(interaction: CommandInteraction) {
-    const serverId = interaction.guildId
-    /**
+/**
      * **Archive jobs**\n
      * \n
      * Current job: ${jobName}\n
@@ -28,7 +29,13 @@ async function execute(interaction: CommandInteraction) {
      *   ... (if more than five are queued)
      * 
      */
-    const allJobs = Archiver.jobs.filter((job) => !job.isStateImmutable() && job.data.serverId === serverId)
+async function execute(interaction: CommandInteraction) {
+    const serverId = interaction.guildId;
+    let {archiveServerId} = serversConfig.getOrCreate(serverId);
+
+    if (archiveServerId.length === 0) archiveServerId = serverId;
+    
+    const allJobs = Archiver.jobs.filter((job) => !job.isStateImmutable() && job.data.serverId === archiveServerId)
     const firstJobs = allJobs.slice(0, 5);
 
     if (allJobs.length == 0) {

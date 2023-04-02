@@ -15,10 +15,9 @@ catAddDefinition.addStringOption(option => option.setName("name")
 async function executeCatAdd(interaction) {
     const categoryName = interaction.options.getString("name");
     const serverId = interaction.guildId;
-    const { archiveServerId, logChannelId } = serversConfig.getOrCreate(serverId);
-    if (archiveServerId.length === 0 || logChannelId.length === 0) {
-        await interaction.reply(`Couldn't add category. Archive server is not yet configured.`);
-        return;
+    let { archiveServerId } = serversConfig.getOrCreate(serverId);
+    if (archiveServerId.length === 0) {
+        archiveServerId = serverId;
     }
     const archiveServer = await retrieveArchiveData(archiveServerId);
     if (archiveServer.channelCount >= Config.archiveLimit) {
@@ -34,13 +33,12 @@ async function executeCatAdd(interaction) {
 }
 const catListDefinition = new SlashCommandSubcommandBuilder();
 catListDefinition.setName("list");
-catListDefinition.setDescription("Sends info regarding the archive server");
+catListDefinition.setDescription("Replies with info regarding the archive server");
 async function executeCatList(interaction) {
     const serverId = interaction.guildId;
-    const { archiveServerId } = serversConfig.getOrCreate(serverId);
+    let { archiveServerId } = serversConfig.getOrCreate(serverId);
     if (archiveServerId.length === 0) {
-        await interaction.reply(`Couldn't check archive status. Archive server is not yet configured.`);
-        return;
+        archiveServerId = serverId;
     }
     const archiveServer = await retrieveArchiveData(archiveServerId);
     let reply = "**Archive Status**\n_ _\n_ _\n";

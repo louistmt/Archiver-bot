@@ -22,12 +22,11 @@ catAddDefinition.addStringOption(option =>
 async function executeCatAdd(interaction: CommandInteraction) {
     const categoryName = interaction.options.getString("name")
     const serverId = interaction.guildId
-    const { archiveServerId, logChannelId } = serversConfig.getOrCreate(serverId);
+    let { archiveServerId } = serversConfig.getOrCreate(serverId);
 
 
-    if (archiveServerId.length === 0 || logChannelId.length === 0) {
-        await interaction.reply(`Couldn't add category. Archive server is not yet configured.`);
-        return;
+    if (archiveServerId.length === 0) {
+        archiveServerId = serverId;
     }
 
     const archiveServer = await retrieveArchiveData(archiveServerId);
@@ -46,17 +45,20 @@ async function executeCatAdd(interaction: CommandInteraction) {
     await interaction.reply(`Created new category \`\`${categoryName}\`\``);
 }
 
+
+
+
+
 const catListDefinition = new SlashCommandSubcommandBuilder()
 catListDefinition.setName("list")
-catListDefinition.setDescription("Sends info regarding the archive server")
+catListDefinition.setDescription("Replies with info regarding the archive server")
 
 async function executeCatList(interaction: CommandInteraction) {
     const serverId = interaction.guildId
-    const { archiveServerId } = serversConfig.getOrCreate(serverId);
+    let { archiveServerId } = serversConfig.getOrCreate(serverId);
 
     if (archiveServerId.length === 0) {
-        await interaction.reply(`Couldn't check archive status. Archive server is not yet configured.`);
-        return;
+        archiveServerId = serverId;
     }
 
     const archiveServer = await retrieveArchiveData(archiveServerId);
@@ -75,6 +77,10 @@ const subExecsMap = produceSubExecsMap(
     { definition: catAddDefinition, execute: executeCatAdd },
     { definition: catListDefinition, execute: executeCatList }
 )
+
+
+
+
 
 const definition = new SlashCommandBuilder();
 definition.setName("category")

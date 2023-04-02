@@ -47,7 +47,7 @@ async function execute(interaction: CommandInteraction) {
         response.push(`Messages Sent: ${msgCount -msgs.length}/${msgCount}\n`);
     }
 
-    response.push("**Archive Queue**");
+    response.push(`**Archive Queue (${allJobs.length})**`);
 
     for (let {data} of firstJobs) {
         const {srcChannelName, destCategoryName} = data as SendRpMsgsJob

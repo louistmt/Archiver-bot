@@ -6,7 +6,7 @@
 // Erase the source channel
 
 import { retrieveAllMessages } from "../../api/archival.mjs";
-import { Worker, Task } from "../../libs/worker/index.mjs";
+import { Worker, Task } from "../../libs/worker-deprecated/index.mjs";
 import { ExportJob, SendJob } from "./types.mjs";
 import send from "./send.mjs";
 import { fileExists } from "../../utils.mjs";

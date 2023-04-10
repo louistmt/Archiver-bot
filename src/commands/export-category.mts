@@ -1,6 +1,6 @@
 import Exporter from "../workers/exporter/exporter.mjs";
 import { ExportJob } from "../workers/exporter/types.mjs";
-import { Job } from "../libs/worker/index.mjs";
+import { Job } from "../libs/worker-deprecated/index.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import type { CommandInteraction, GuildBasedChannel } from "discord.js";

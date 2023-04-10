@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
-import Job from "../../libs/worker/Job.mjs";
+import Job from "../../libs/worker-deprecated/Job.mjs";
 import Exporter from "../../workers/exporter/exporter.mjs";
 import { ExportJob } from "../../workers/exporter/types.mjs";
 

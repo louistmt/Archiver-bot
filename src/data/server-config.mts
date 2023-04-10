@@ -1,4 +1,4 @@
-import { ISerializable } from "../libs/pirate-chest/types.mjs";
+import { ISerializable } from "../libs/pirate-chest-deprecated/types.mjs";
 import { JSONObject } from "../libs/common.mjs";
 
 type ServerConfig = {

@@ -1,4 +1,4 @@
-import { ChestMigration } from "../libs/pirate-chest/index.mjs";
+import { ChestMigration } from "../libs/pirate-chest-deprecated/index.mjs";
 import ServersConfig from "./server-config.mjs";
 
 const migration = new ChestMigration<ServersConfig>();

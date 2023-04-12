@@ -1,4 +1,4 @@
-import client from "./client.mjs";
+import client from "./services/client.mjs";
 
 import Archiver from "./workers/archiver.mjs";
 import Exporter from "./workers/exporter/exporter.mjs";

@@ -2,7 +2,7 @@ import { MessageAttachment } from "discord.js";
 import { createMultiTagFunction, IJob } from "../../libs/worker-deprecated/index.mjs"; 
 import { capitalize } from "../../utils.mjs";
 import { SendJob } from "./types.mjs";
-import client from "../../client.mjs";
+import client from "../../services/client.mjs";
 
 /**
  * JSON FORMAT

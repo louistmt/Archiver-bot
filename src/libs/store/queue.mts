@@ -51,13 +51,19 @@ export default function readStoredQueue<T extends StorableValue>(dirPath: string
         },
 
         dequeue() {
-            tracker++;
-            return queue.shift()
+            trackerFlag = true
+            return queue[tracker++]
         },
 
         save() {
-            if (trackerFlag) writeFileSync(trackerFilePath, `${tracker}`, {encoding: "utf-8"})
-            if (queueFlag) writeJSONFile(queueFilePath, queue)
+            if (queueFlag) {
+                writeJSONFile(queueFilePath, queue)
+                writeFileSync(trackerFilePath, "0", {encoding: "utf-8"})
+                tracker = 0
+            } else if (trackerFlag) {
+                writeFileSync(trackerFilePath, `${tracker}`, {encoding: "utf-8"})
+            }
+
             trackerFlag = false
             queueFlag = false
         }

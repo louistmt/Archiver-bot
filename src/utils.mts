@@ -1,4 +1,4 @@
-import {accessSync, constants, readFileSync, writeFileSync} from "node:fs";
+import {accessSync, constants, readFileSync, writeFileSync, openSync, closeSync} from "node:fs";
 
 /**
  * Used to create a multiline string until indentation for multiline strings
@@ -154,6 +154,10 @@ export function fileExists(path) {
     }
 }
 
+export function createFile(path) {
+    closeSync(openSync(path, "w"));
+}
+
 /**
  * Reads the file at the specified path and returns it as a JSON Object
  * @param {string} path Path to the file
@@ -227,4 +231,38 @@ export function arrayToSet(array) {
     }
 
     return set;
+}
+
+export function createSleepAwake() {
+    let awakeFlag = false
+    let awakeResolve = undefined
+
+    function awake() {
+        if (awakeResolve !== undefined) {
+            awakeResolve()
+            awakeFlag = true
+            awakeResolve = undefined
+        }
+    }
+
+    async function sleep() {
+        if (awakeFlag) {
+            awakeFlag = false
+            return Promise.resolve()
+        }
+
+        if (awakeResolve === undefined) {
+            const promise = new Promise((resolve) => {
+                awakeResolve = resolve
+            })
+
+            await promise
+            awakeFlag = false
+
+        } else {
+            throw new Error("Already asleep")
+        }
+    }
+
+    return {awake, sleep}
 }

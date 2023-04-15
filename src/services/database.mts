@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes } from "sequelize"
+import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes } from "sequelize"
 import Config from "../config.mjs"
 
 const sequelize = new Sequelize({
@@ -7,7 +7,13 @@ const sequelize = new Sequelize({
     storage: Config.paths.sqlite3
 })
 
-const ServersConfig = sequelize.define("ServersConfig", {
+interface ServersConfig extends Model<InferAttributes<ServersConfig>, InferCreationAttributes<ServersConfig>> {
+    serverId: string
+    archiveServerId: string
+    logChannelId: string
+}
+
+export const ServersConfig = sequelize.define<ServersConfig>("ServersConfig", {
     serverId: {
         type: DataTypes.STRING,
         primaryKey: true
@@ -16,34 +22,29 @@ const ServersConfig = sequelize.define("ServersConfig", {
     logChannelId: DataTypes.STRING
 })
 
-const ArchiveJobs = sequelize.define("ArchiveJobs", {
+interface Jobs extends Model<InferAttributes<Jobs>, InferCreationAttributes<Jobs>> {
+    jobId: string
+    jobName: string
+}
+
+export const Jobs = sequelize.define<Jobs>("Jobs", {
     jobId: {
         type: DataTypes.STRING,
         primaryKey: true
     },
-    srcServerId: DataTypes.STRING,
-    srcChannelId: DataTypes.STRING,
-    srcChannelName: DataTypes.STRING,
-    destServerId: DataTypes.STRING,
-    destChannelId: DataTypes.STRING,
-    destChannelName: DataTypes.STRING
+    jobName: DataTypes.STRING
 })
 
-const ArchiveTasks = sequelize.define("ArchiveTasks", {
+interface JobTasks extends Model<InferAttributes<JobTasks>, InferCreationAttributes<JobTasks>> {
+    jobId: string
+    taskName: string
+    data: string
+}
+
+export const JobTasks = sequelize.define<JobTasks>("JobTasks", {
     jobId: DataTypes.STRING,
     taskName: DataTypes.STRING,
-    data: DataTypes.STRING
-})
-
-const ExportJobs = sequelize.define("ExportJobs", {
-    jobId: {
-        type: DataTypes.STRING,
-        primaryKey: true
-    },
-    format: DataTypes.STRING,
-    srcChannelId: DataTypes.STRING,
-    srcChannelName: DataTypes.STRING,
-    destChannelId: DataTypes.STRING
+    data: DataTypes.TEXT
 })
 
 await sequelize.sync()

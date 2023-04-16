@@ -1,8 +1,6 @@
 import { getChannel } from "../api/channels.mjs";
 import { ServersConfigChest } from "../data/index.mjs";
-import Archiver from "../workers/archiver.mjs";
-import { RpArchiveJob } from "../workers/archiver.mjs";
-import { Job } from "../libs/worker-deprecated/index.mjs";
+import Archiver from "../services/archiver.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import type { CommandInteraction } from "discord.js";
@@ -48,16 +46,7 @@ async function execute(interaction: CommandInteraction) {
         return
     }
 
-    const job = Job.create<RpArchiveJob>(srcChannelName, {
-        destCategoryName,
-        serverId: archiveServerId,
-        srcServerId,
-        srcChannelId,
-        srcChannelName
-    });
-
-    Archiver.enqueueJob(job);
-
+    await Archiver.queue(`archive-${srcChannelId}`, {srcChannelId, srcChannelName, destServerId: archiveServerId, destCategoryName})
     await interaction.reply(`Queueing ${srcChannelName} for archive in \`\`${destCategoryName}\`\``);
 
 }

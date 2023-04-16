@@ -1,5 +1,4 @@
-import Exporter from "../workers/exporter/exporter.mjs";
-import { ExportJob } from "../workers/exporter/types.mjs";
+import Exporter from "../services/exporter.mjs";
 import { Job } from "../libs/worker-deprecated/index.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
@@ -46,12 +45,7 @@ async function execute(interaction: CommandInteraction) {
     const srcChannels = serverInfo.catTextChannels.get(category.id)
 
     for (let {id, name} of srcChannels) {
-        const job = Job.create<ExportJob>(name, {
-            srcChannelId: id,
-            srcChannelName: name,
-            destChannelId: destChannel.id
-        }, "webpage")
-        Exporter.enqueueJob(job)
+        Exporter.queue(`export-${id}`, {format: "webpage", srcChannelId: id, srcChannelName: name, destChannelId: destChannel.id})
     }
     
     await interaction.reply(`Queued ${srcChannels.length} to be exported`)

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
-import Archiver from "../workers/archiver.mjs";
+import Archiver from "../services/archiver.mjs";
 const definition = new SlashCommandBuilder();
 definition.setName("cancel");
 definition.setDescription("Cancels archival jobs that may have been scheduled for this channel");
@@ -10,11 +10,9 @@ definition.addChannelOption(option => option.setName("channel")
 definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 definition.setDMPermission(false);
 async function execute(interaction) {
-    const jobs = Archiver.jobs;
     const channelId = interaction.options.getChannel("channel").id;
-    const jobsToCancel = jobs.filter((job) => job.data.srcChannelId === channelId && !job.isStateImmutable());
-    jobsToCancel.forEach((job) => { job.cancel(); });
-    await interaction.reply(`Canceled ${jobsToCancel.length} jobs.`);
+    await Archiver.dequeue(`archive-${channelId}`);
+    await interaction.reply(`Canceled job.`);
 }
 const cancelCmd = { definition, execute };
 export default cancelCmd;

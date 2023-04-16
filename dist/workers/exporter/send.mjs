@@ -1,7 +1,7 @@
 import { MessageAttachment } from "discord.js";
-import { createMultiTagFunction } from "../../libs/worker/index.mjs";
+import { createMultiTagFunction } from "../../libs/worker-deprecated/index.mjs";
 import { capitalize } from "../../utils.mjs";
-import client from "../../client.mjs";
+import client from "../../services/client.mjs";
 /**
  * JSON FORMAT
  * {

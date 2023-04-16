@@ -4,7 +4,7 @@ import { ServersConfigChest } from "../data/index.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
 import { postMessageToWebhook, deleteWebhook } from "../api/webhooks.mjs";
 import { postMessage, deleteChannel } from "../api/channels.mjs";
-import { JobState, Task, Worker } from "../libs/worker/index.mjs";
+import { JobState, Task, Worker } from "../libs/worker-deprecated/index.mjs";
 import { HTTPError } from "discord.js";
 const { error: logError } = preLogs("Archiver");
 const serversConfig = ServersConfigChest.get();

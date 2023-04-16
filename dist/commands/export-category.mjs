@@ -1,5 +1,5 @@
 import Exporter from "../workers/exporter/exporter.mjs";
-import { Job } from "../libs/worker/index.mjs";
+import { Job } from "../libs/worker-deprecated/index.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import { retrieveServerInfo } from "../api/archival.mjs";

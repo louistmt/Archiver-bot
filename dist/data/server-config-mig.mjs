@@ -1,4 +1,4 @@
-import { ChestMigration } from "../libs/pirate-chest/index.mjs";
+import { ChestMigration } from "../libs/pirate-chest-deprecated/index.mjs";
 const migration = new ChestMigration();
 migration.addTarget(1, 2, (data) => {
     const newData = {};

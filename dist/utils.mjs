@@ -1,4 +1,4 @@
-import { accessSync, constants, readFileSync, writeFileSync } from "node:fs";
+import { accessSync, constants, readFileSync, writeFileSync, openSync, closeSync } from "node:fs";
 /**
  * Used to create a multiline string until indentation for multiline strings
  * is properly handled.
@@ -134,6 +134,9 @@ export function fileExists(path) {
     catch (err) {
         return false;
     }
+}
+export function createFile(path) {
+    closeSync(openSync(path, "w"));
 }
 /**
  * Reads the file at the specified path and returns it as a JSON Object

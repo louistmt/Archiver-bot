@@ -1,8 +1,9 @@
 import { Client } from "discord.js";
-import Config from "./config.mjs";
-import { preLogs } from "./utils.mjs";
+import Config from "../config.mjs";
+import { preLogs } from "../utils.mjs";
 const { log, error } = preLogs("Client");
 const client = new Client(Config.clientOptions);
+client.token = Config.token;
 client.on("error", error);
 client.once("ready", () => {
     log("Bot is online");

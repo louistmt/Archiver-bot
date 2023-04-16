@@ -1,7 +1,7 @@
 import { getChannel } from "../api/channels.mjs";
 import { ServersConfigChest } from "../data/index.mjs";
 import Archiver from "../workers/archiver.mjs";
-import { Job } from "../libs/worker/index.mjs";
+import { Job } from "../libs/worker-deprecated/index.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import { preLogs } from "../utils.mjs";

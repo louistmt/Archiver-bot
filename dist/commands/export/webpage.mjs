@@ -1,5 +1,5 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
-import Job from "../../libs/worker/Job.mjs";
+import Job from "../../libs/worker-deprecated/Job.mjs";
 import Exporter from "../../workers/exporter/exporter.mjs";
 const exportWebPageDefinition = new SlashCommandSubcommandBuilder();
 exportWebPageDefinition.setName("webpage");

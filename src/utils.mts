@@ -232,37 +232,3 @@ export function arrayToSet(array) {
 
     return set;
 }
-
-export function createSleepAwake() {
-    let awakeFlag = false
-    let awakeResolve = undefined
-
-    function awake() {
-        if (awakeResolve !== undefined) {
-            awakeResolve()
-            awakeFlag = true
-            awakeResolve = undefined
-        }
-    }
-
-    async function sleep() {
-        if (awakeFlag) {
-            awakeFlag = false
-            return Promise.resolve()
-        }
-
-        if (awakeResolve === undefined) {
-            const promise = new Promise((resolve) => {
-                awakeResolve = resolve
-            })
-
-            await promise
-            awakeFlag = false
-
-        } else {
-            throw new Error("Already asleep")
-        }
-    }
-
-    return {awake, sleep}
-}

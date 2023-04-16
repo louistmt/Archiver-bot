@@ -1,7 +1,6 @@
 import { getChannel } from "../api/channels.mjs";
 import { ServersConfigChest } from "../data/index.mjs";
-import Archiver from "../workers/archiver.mjs";
-import { Job } from "../libs/worker-deprecated/index.mjs";
+import Archiver from "../services/archiver.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import { preLogs } from "../utils.mjs";
@@ -35,14 +34,7 @@ async function execute(interaction) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. The category '${destCategoryName}' does not exist`);
         return;
     }
-    const job = Job.create(srcChannelName, {
-        destCategoryName,
-        serverId: archiveServerId,
-        srcServerId,
-        srcChannelId,
-        srcChannelName
-    });
-    Archiver.enqueueJob(job);
+    await Archiver.queue(`archive-${srcChannelId}`, { srcChannelId, srcChannelName, destServerId: archiveServerId, destCategoryName });
     await interaction.reply(`Queueing ${srcChannelName} for archive in \`\`${destCategoryName}\`\``);
 }
 const archiveCmd = { definition, execute };

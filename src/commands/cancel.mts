@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
 import { CommandInteraction } from "discord.js";
 import { Command } from "../libs/cmds.mjs";
-import Archiver from "../workers/archiver.mjs";
+import Archiver from "../services/archiver.mjs";
 
 const definition = new SlashCommandBuilder()
 definition.setName("cancel")
@@ -16,12 +16,9 @@ definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 definition.setDMPermission(false)
 
 async function execute(interaction: CommandInteraction) {
-    const jobs = Archiver.jobs;
     const channelId = interaction.options.getChannel("channel").id
-    const jobsToCancel = jobs.filter((job) => job.data.srcChannelId === channelId && !job.isStateImmutable())
-
-    jobsToCancel.forEach((job) => { job.cancel() })
-    await interaction.reply(`Canceled ${jobsToCancel.length} jobs.`)
+    await Archiver.dequeue(`archive-${channelId}`)
+    await interaction.reply(`Canceled job.`)
 }
 
 const cancelCmd: Command = {definition, execute};

@@ -1,10 +1,11 @@
-import { JobTasks } from "./database.mjs";
-import { ITasker, TaskFunction } from "../libs/job-queue.mjs";
+import { JobTasks, Jobs, sequelize } from "./database.mjs";
+import { Controller, ITasker, TaskFunction } from "../libs/tasker-interfaces.mjs";
 import { JSONType } from "../libs/common.mjs";
-import { createSleepAwake } from "../utils.mjs";
+import { preLogs } from "../utils.mjs";
 
+const {log, error} = preLogs("Tasker")
 const handlerMap: Map<string, TaskFunction> = new Map()
-const {awake, sleep} = createSleepAwake()
+const controller = new Controller()
 
 function addTaskHandlers(...handlers: TaskFunction[]) {
     for (let handler of handlers) {
@@ -15,11 +16,13 @@ function addTaskHandlers(...handlers: TaskFunction[]) {
 }
 
 async function start() {
-    while (true) {
+    while (!controller.interrupted) {
         const task = await JobTasks.findOne({order: ["rowid", "ASC"]})
 
         if (task === null) {
-            await sleep()
+            log("Waiting for tasks")
+            await controller.waitSignal()
+            log("New tasks arrived")
             continue
         }
 
@@ -27,9 +30,36 @@ async function start() {
         if (!handlerMap.has(taskName)) throw new Error(`Task named ${taskName} has no corresponding handler`)
         const handler = handlerMap.get(taskName)
         const data = JSON.parse(serialized)
-        await handler(jobId, data, Tasker)
+
+        try {
+            await handler(jobId, data, Tasker)
+        } catch (err) {
+            const {jobName} = await Jobs.findOne({"where" : {jobId}})
+            error(`Canceling all request for ${jobName} due to an unhandled error\n`, err)
+            await Tasker.removeJob(jobId)
+        }
+
         await task.destroy()
     }
+
+    controller.confirmInterrupt()
+}
+
+async function stop() {
+    log("Shutting down...")
+    await controller.interrupt()
+    log("Shutdown complete")
+}
+
+async function addJob(jobId: string, jobName: string, tasks: [TaskFunction, any][]) {
+    await sequelize.transaction(async (t) => {
+        const tsks = tasks.map(([handler, item]) => {
+            return {jobId, taskName: handler.name, data:JSON.stringify(item)}
+        })
+
+        await Jobs.create({jobId, jobName}, {transaction: t})
+        await JobTasks.bulkCreate(tsks, {validate: true})
+    })
 }
 
 async function addTasks<T extends JSONType = any>(jobId: string, task: TaskFunction<T>, ...data: T[]) {
@@ -44,23 +74,29 @@ async function addTasks<T extends JSONType = any>(jobId: string, task: TaskFunct
     }
 
     await JobTasks.bulkCreate(tasks, {validate: true})
-    awake()
+    controller.signal()
 }
 
-async function removeTasks(jobId: string) {
-    await JobTasks.destroy({where: {jobId}})
+async function removeJob(jobId: string) {
+    await sequelize.transaction(async (t) => {
+        await JobTasks.destroy({where: {jobId}, transaction: t})
+        await Jobs.destroy({where: {jobId}, transaction: t})
+    })
 }
 
 async function getTasksFor(jobId: string, task: TaskFunction<any>) {
-    return JobTasks.findAll({where: {jobId, taskName: task.name}})
+    return await JobTasks.findAll({where: {jobId, taskName: task.name}, order: ["rowid", "ASC"]})
 }
 
 const Tasker: ITasker = {
     addTaskHandlers,
     start,
+    stop,
+    addJob,
     addTasks,
-    removeTasks,
+    removeJob,
     getTasksFor
 };
 
+start()
 export default Tasker;

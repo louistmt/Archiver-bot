@@ -1,7 +1,7 @@
 import { Sequelize, Model, DataTypes, InferAttributes, InferCreationAttributes } from "sequelize"
 import Config from "../config.mjs"
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
     database: "db",
     dialect: "sqlite",
     storage: Config.paths.sqlite3

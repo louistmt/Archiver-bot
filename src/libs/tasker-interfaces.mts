@@ -8,7 +8,7 @@ import { JSONType } from "./common.mjs";
 export interface IJobQueue<T extends JSONType = any> {
     queue(id: string, data: T): Promise<void>
     dequeue(id: string): Promise<void>
-    getCountFor(id: string, task: TaskFunction): Promise<number>
+    getTaskCountFor(id: string, task: TaskFunction): Promise<number>
 }
 
 export type TaskFunction<T extends JSONType = any> = (jobId: string, data: T, tasker: ITasker) => Promise<void>

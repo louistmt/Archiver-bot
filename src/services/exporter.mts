@@ -60,14 +60,14 @@ async function dequeue(id: string) {
     await Tasker.removeJob(id)
 }
 
-async function getCountFor(jobId: string, task: TaskFunction) {
+async function getTaskCountFor(jobId: string, task: TaskFunction) {
     return (await Tasker.getTasksFor(jobId, task)).length
 }
 
 const Exporter: IJobQueue<ExportJob> = {
     queue,
     dequeue,
-    getCountFor
+    getTaskCountFor
 }
 
 export default Exporter

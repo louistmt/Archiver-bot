@@ -77,14 +77,14 @@ export async function dequeue(jobId: string) {
     await Tasker.removeJob(jobId)
 }
 
-export async function getCountFor(jobId: string, task: TaskFunction): Promise<number> {
+export async function getTaskCountFor(jobId: string, task: TaskFunction): Promise<number> {
     return (await Tasker.getTasksFor(jobId, task)).length
 }
 
 const Archiver: IJobQueue<ArchiveJob> = {
     queue,
     dequeue,
-    getCountFor
+    getTaskCountFor
 };
 
 export default Archiver

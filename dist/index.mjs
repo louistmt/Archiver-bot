@@ -1,10 +1,8 @@
 import client from "./services/client.mjs";
-import Archiver from "./workers/archiver.mjs";
-import Exporter from "./workers/exporter/exporter.mjs";
+import Tasker from "./services/tasker.mjs";
 import Config from "./config.mjs";
 import { execsMap } from "./commands/index.mjs";
 import { singleCallFix, preLogs } from "./utils.mjs";
-import { ServersConfigChest } from "./data/index.mjs";
 const { log, error } = preLogs("Client");
 // Logging unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
@@ -25,15 +23,11 @@ process.on("SIGINT", singleCallFix(() => {
     shutdown();
 }));
 async function shutdown() {
-    await Archiver.shutdown();
-    await Exporter.shutdown();
-    Archiver.save(Config.paths.archiverState);
-    Exporter.save(Config.paths.exporterState);
-    ServersConfigChest.save();
+    await Tasker.stop();
     client.destroy();
-    process.exit(0);
+    client.emit("exit");
 }
-async function startup() {
+export default async function startup() {
     client.on("interactionCreate", async (interaction) => {
         if (!interaction.isCommand())
             return;
@@ -52,5 +46,5 @@ async function startup() {
     });
     log("Starting up client");
     await client.login(Config.token);
+    await Tasker.start();
 }
-await startup();

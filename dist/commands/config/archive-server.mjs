@@ -1,7 +1,6 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v10";
-import { ServersConfigChest } from "../../data/index.mjs";
-const serversConfig = ServersConfigChest.get();
+import { ServersConfig } from "../../services/database.mjs";
 const configArchiveDefinition = new SlashCommandSubcommandBuilder();
 configArchiveDefinition.setName("archive-server");
 configArchiveDefinition.setDescription("Configures the server that will be used for as an archive");
@@ -11,7 +10,11 @@ configArchiveDefinition.addStringOption(option => option.setName("server-id")
 async function configArchiveExecute(interaction) {
     const guildId = interaction.options.getString("server-id");
     const userId = interaction.member.user.id;
-    const config = serversConfig.getOrCreate(interaction.guildId);
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: ""
+    };
+    const [config] = await ServersConfig.findOrCreate({ where: { serverId: interaction.guildId }, defaults: defaultConfig });
     // Check if we have access to the archive server
     const guild = interaction.client.guilds.cache.get(guildId);
     if (!guild) {
@@ -29,6 +32,7 @@ async function configArchiveExecute(interaction) {
         return;
     }
     config.archiveServerId = guildId;
+    await config.save();
     await interaction.reply("Archive server has been set.");
 }
 export { configArchiveDefinition, configArchiveExecute };

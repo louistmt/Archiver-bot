@@ -1,6 +1,5 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
-import Job from "../../libs/worker-deprecated/Job.mjs";
-import Exporter from "../../workers/exporter/exporter.mjs";
+import Exporter from "../../services/exporter.mjs";
 const exportJsonDefinition = new SlashCommandSubcommandBuilder();
 exportJsonDefinition.setName("json");
 exportJsonDefinition.setDescription("Exports a channel to another as a JSON file");
@@ -15,12 +14,7 @@ async function exportJsonExecute(interaction) {
     const srcChannelId = srcChannel.id;
     const srcChannelName = srcChannel.name;
     const destChannelId = interaction.options.getChannel("dest-channel").id;
-    const job = Job.create(srcChannelName, {
-        srcChannelId,
-        srcChannelName,
-        destChannelId
-    }, "json");
-    Exporter.enqueueJob(job);
+    await Exporter.queue(`export-${srcChannelId}`, { format: "json", srcChannelId, srcChannelName, destChannelId });
     await interaction.reply(`Exporting ${srcChannelName} as a JSON file`);
 }
 export { exportJsonDefinition, exportJsonExecute };

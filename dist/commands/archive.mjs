@@ -1,11 +1,10 @@
 import { getChannel } from "../api/channels.mjs";
-import { ServersConfigChest } from "../data/index.mjs";
+import { ServersConfig } from "../services/database.mjs";
 import Archiver from "../services/archiver.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { PermissionFlagsBits } from "discord-api-types/v9";
+import { PermissionFlagsBits } from "discord-api-types/v10";
 import { preLogs } from "../utils.mjs";
 import { retrieveArchiveData } from "../api/archival.mjs";
-const serversConfig = ServersConfigChest.get();
 const { log } = preLogs("Archive");
 const definition = new SlashCommandBuilder();
 definition.setName("archive")
@@ -24,7 +23,12 @@ async function execute(interaction) {
     const srcChannelId = interaction.options.getChannel("channel").id;
     const srcChannelName = (await getChannel(srcChannelId)).name;
     const destCategoryName = interaction.options.getString("category");
-    const { archiveServerId, logChannelId } = serversConfig.getOrCreate(srcServerId);
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: ""
+    };
+    const [config] = await ServersConfig.findOrCreate({ where: { serverId: srcServerId }, defaults: defaultConfig });
+    let { archiveServerId, logChannelId } = config;
     if (archiveServerId.length === 0 || logChannelId.length === 0) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. Archive server is not yet configured.`);
         return;

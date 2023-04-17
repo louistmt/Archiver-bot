@@ -35,12 +35,12 @@ async function queue(id, data) {
 async function dequeue(id) {
     await Tasker.removeJob(id);
 }
-async function getCountFor(jobId, task) {
+async function getTaskCountFor(jobId, task) {
     return (await Tasker.getTasksFor(jobId, task)).length;
 }
 const Exporter = {
     queue,
     dequeue,
-    getCountFor
+    getTaskCountFor
 };
 export default Exporter;

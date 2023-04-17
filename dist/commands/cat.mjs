@@ -3,9 +3,8 @@ import { produceSubExecsMap } from "../libs/cmds.mjs";
 import Config from "../config.mjs";
 import { retrieveArchiveData } from "../api/archival.mjs";
 import { createChannel } from "../api/channels.mjs";
-import { ServersConfigChest } from "../data/index.mjs";
+import { ServersConfig } from "../services/database.mjs";
 import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10";
-const serversConfig = ServersConfigChest.get();
 const catAddDefinition = new SlashCommandSubcommandBuilder();
 catAddDefinition.setName("add");
 catAddDefinition.setDescription("Adds a category to the archive server with the specified name");
@@ -15,7 +14,12 @@ catAddDefinition.addStringOption(option => option.setName("name")
 async function executeCatAdd(interaction) {
     const categoryName = interaction.options.getString("name");
     const serverId = interaction.guildId;
-    let { archiveServerId } = serversConfig.getOrCreate(serverId);
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: ""
+    };
+    const [config] = await ServersConfig.findOrCreate({ where: { serverId: interaction.guildId }, defaults: defaultConfig });
+    let { archiveServerId } = config;
     if (archiveServerId.length === 0) {
         archiveServerId = serverId;
     }
@@ -36,7 +40,12 @@ catListDefinition.setName("list");
 catListDefinition.setDescription("Replies with info regarding the archive server");
 async function executeCatList(interaction) {
     const serverId = interaction.guildId;
-    let { archiveServerId } = serversConfig.getOrCreate(serverId);
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: ""
+    };
+    const [config] = await ServersConfig.findOrCreate({ where: { serverId: interaction.guildId }, defaults: defaultConfig });
+    let { archiveServerId } = config;
     if (archiveServerId.length === 0) {
         archiveServerId = serverId;
     }

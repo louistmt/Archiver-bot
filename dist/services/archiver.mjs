@@ -3,8 +3,8 @@ import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
 import { postMessageToWebhook } from "../api/webhooks.mjs";
 import { postMessage } from "../api/channels.mjs";
 async function createDestTask(jobId, data, tasker) {
-    const { destServerId, destChannelName, destCategoryName, srcChannelId } = data;
-    const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, destChannelName);
+    const { destServerId, srcChannelName, destCategoryName, srcChannelId } = data;
+    const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, srcChannelName);
     await tasker.addTasks(jobId, getMsgsTask, { srcChannelId, webhookId, webhookToken });
 }
 async function getMsgsTask(jobId, data, tasker) {
@@ -31,12 +31,12 @@ export async function queue(jobId, data) {
 export async function dequeue(jobId) {
     await Tasker.removeJob(jobId);
 }
-export async function getCountFor(jobId, task) {
+export async function getTaskCountFor(jobId, task) {
     return (await Tasker.getTasksFor(jobId, task)).length;
 }
 const Archiver = {
     queue,
     dequeue,
-    getCountFor
+    getTaskCountFor
 };
 export default Archiver;

@@ -13,8 +13,9 @@ function addTaskHandlers(...handlers) {
     }
 }
 async function start() {
+    log("Started service");
     while (!controller.interrupted) {
-        const task = await JobTasks.findOne({ order: ["rowid", "ASC"] });
+        const task = await JobTasks.findOne({ order: [["rowid", "ASC"]] });
         if (task === null) {
             log("Waiting for tasks");
             await controller.waitSignal();
@@ -35,6 +36,8 @@ async function start() {
             await Tasker.removeJob(jobId);
         }
         await task.destroy();
+        if (!(await JobTasks.findOne({ where: { jobId } })))
+            await Jobs.destroy({ where: { jobId } });
     }
     controller.confirmInterrupt();
 }
@@ -49,8 +52,9 @@ async function addJob(jobId, jobName, tasks) {
             return { jobId, taskName: handler.name, data: JSON.stringify(item) };
         });
         await Jobs.create({ jobId, jobName }, { transaction: t });
-        await JobTasks.bulkCreate(tsks, { validate: true });
+        await JobTasks.bulkCreate(tsks, { validate: true, transaction: t });
     });
+    controller.signal();
 }
 async function addTasks(jobId, task, ...data) {
     const taskName = task.name;
@@ -71,7 +75,7 @@ async function removeJob(jobId) {
     });
 }
 async function getTasksFor(jobId, task) {
-    return await JobTasks.findAll({ where: { jobId, taskName: task.name }, order: ["rowid", "ASC"] });
+    return await JobTasks.findAll({ where: { jobId, taskName: task.name }, order: [["rowid", "ASC"]] });
 }
 const Tasker = {
     addTaskHandlers,
@@ -82,5 +86,4 @@ const Tasker = {
     removeJob,
     getTasksFor
 };
-start();
 export default Tasker;

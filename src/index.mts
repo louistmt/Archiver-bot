@@ -32,7 +32,7 @@ process.on("SIGINT", singleCallFix(() => {
 async function shutdown() {
     await Tasker.stop()
     client.destroy()
-    process.exit(0)
+    // process.exit(0)
 }
 
 async function startup() {

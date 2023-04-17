@@ -44,7 +44,7 @@ async function execute(interaction: CommandInteraction) {
     const srcChannels = serverInfo.catTextChannels.get(category.id)
 
     for (let {id, name} of srcChannels) {
-        Exporter.queue(`export-${id}`, {format: "webpage", srcChannelId: id, srcChannelName: name, destChannelId: destChannel.id})
+        await Exporter.queue(`export-${id}`, {format: "webpage", srcChannelId: id, srcChannelName: name, destChannelId: destChannel.id})
     }
     
     await interaction.reply(`Queued ${srcChannels.length} to be exported`)

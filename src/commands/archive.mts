@@ -1,15 +1,14 @@
-import { getChannel } from "../api/channels.mjs";
-import { ServersConfigChest } from "../data/index.mjs";
-import Archiver from "../services/archiver.mjs";
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { PermissionFlagsBits } from "discord-api-types/v9";
-import type { CommandInteraction } from "discord.js";
-import { preLogs } from "../utils.mjs";
-import { Command } from "../libs/cmds.mjs";
-import { retrieveArchiveData } from "../api/archival.mjs";
+import { getChannel } from "../api/channels.mjs"
+import { ServersConfig } from "../services/database.mjs"
+import Archiver from "../services/archiver.mjs"
+import { SlashCommandBuilder } from "@discordjs/builders"
+import { PermissionFlagsBits } from "discord-api-types/v10"
+import type { CommandInteraction } from "discord.js"
+import { preLogs } from "../utils.mjs"
+import { Command } from "../libs/cmds.mjs"
+import { retrieveArchiveData } from "../api/archival.mjs"
 
-const serversConfig = ServersConfigChest.get();
-const { log } = preLogs("Archive");
+const { log } = preLogs("Archive")
 
 const definition = new SlashCommandBuilder()
 definition.setName("archive")
@@ -32,7 +31,12 @@ async function execute(interaction: CommandInteraction) {
     const srcChannelId = interaction.options.getChannel("channel").id
     const srcChannelName = (await getChannel(srcChannelId) as any).name;
     const destCategoryName = interaction.options.getString("category")
-    const { archiveServerId, logChannelId } = serversConfig.getOrCreate(srcServerId)
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: "" 
+    }
+    const [config] = await ServersConfig.findOrCreate({where: {serverId: interaction.guildId}, defaults: defaultConfig})
+    let {archiveServerId, logChannelId} = config
 
     if (archiveServerId.length === 0 || logChannelId.length === 0) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. Archive server is not yet configured.`)

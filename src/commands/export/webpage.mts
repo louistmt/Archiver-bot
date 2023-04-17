@@ -1,8 +1,6 @@
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
-import Job from "../../libs/worker-deprecated/Job.mjs";
-import Exporter from "../../workers/exporter/exporter.mjs";
-import { ExportJob } from "../../workers/exporter/types.mjs";
+import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import { CommandInteraction } from "discord.js"
+import Exporter from "../../services/exporter.mjs"
 
 
 const exportWebPageDefinition = new SlashCommandSubcommandBuilder()
@@ -25,14 +23,7 @@ async function exportWebPageExecute(interaction: CommandInteraction) {
     const srcChannelName = srcChannel.name
     const destChannelId = interaction.options.getChannel("dest-channel").id
 
-    const job = Job.create<ExportJob>(srcChannelName, {
-        srcChannelId,
-        srcChannelName,
-        destChannelId
-    }, "webpage");
-
-    Exporter.enqueueJob(job);
-
+    await Exporter.queue(`export-${srcChannelId}`, {format: "json", srcChannelId, srcChannelName, destChannelId})
     await interaction.reply(`Exporting ${srcChannelName} as a viewable link`);
 }
 

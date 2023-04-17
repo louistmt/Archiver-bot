@@ -1,19 +1,17 @@
-import { produceDefinitionList, produceExecsMap } from "../libs/cmds.mjs";
-import archiveCmd from "./archive.mjs";
-import cancelCmd from "./cancel.mjs";
-import catCmd from "./cat.mjs";
-import configCmd from "./config/index.mjs";
-import jobsCmd from "./jobs.mjs";
-import exportCmd from "./export/index.mjs";
-import exportCatCmd from "./export-category.mjs";
-import dumpGDocCmd from "./dump-gdoc.mjs";
+import { produceDefinitionList, produceExecsMap } from "../libs/cmds.mjs"
+import archiveCmd from "./archive.mjs"
+import cancelCmd from "./cancel.mjs"
+import catCmd from "./cat.mjs"
+import configCmd from "./config/index.mjs"
+import exportCmd from "./export/index.mjs"
+import exportCatCmd from "./export-category.mjs"
+import dumpGDocCmd from "./dump-gdoc.mjs"
 
 export const execsMap = produceExecsMap(
     archiveCmd,
     cancelCmd,
     catCmd,
     configCmd,
-    jobsCmd,
     exportCmd,
     exportCatCmd,
     dumpGDocCmd
@@ -24,7 +22,6 @@ export const definitionsList = produceDefinitionList(
     cancelCmd,
     catCmd,
     configCmd,
-    jobsCmd,
     exportCmd,
     exportCatCmd,
     dumpGDocCmd

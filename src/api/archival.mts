@@ -158,6 +158,7 @@ export async function createArchiveChannel(guildId: string, categoryName: string
     return { channelId, webhookId, webhookToken };
 }
 
+const mentionsRegex = /<@.*?>/gm
 /**
  * Retrieves all rp messages in a tidy format ready to be sent.
  * @param {string} targetChannelId The channel to retrieve the rp messages from
@@ -167,6 +168,8 @@ export async function retrieveAllRpMessages(targetChannelId) {
     return (
         await ChannelsAPI.getAllWebhookMessages(targetChannelId)
     ).map(({ author, content }) => {
+        content = content.trim().length === 0 ? "." : content
+        content = content.replaceAll(mentionsRegex, ".")
         return {
             avatarUrl: avatarHashToUrl(author.id, author.avatar),
             username: author.username,
@@ -184,6 +187,8 @@ export async function retrieveAllMessages(targetChannelId) {
     return (
         await ChannelsAPI.getAllChannelMessages(targetChannelId)
     ).map(({ author, content }) => {
+        content = content.trim().length === 0 ? "." : content
+        content = content.replaceAll(mentionsRegex, ".")
         return {
             avatarUrl: avatarHashToUrl(author.id, author.avatar),
             username: author.username,

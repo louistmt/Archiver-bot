@@ -1,13 +1,12 @@
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
-import { REST } from "@discordjs/rest";
-import { PermissionFlagsBits, Routes } from "discord-api-types/v10";
+import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import { CommandInteraction } from "discord.js"
+import { REST } from "@discordjs/rest"
+import { Routes } from "discord-api-types/v10"
+import { ServersConfig } from "../../services/database.mjs"
 
-import { ServersConfigChest } from "../../data/index.mjs";
-import Config from "../../config.mjs";
+import Config from "../../config.mjs"
 
 
-const serversConfig = ServersConfigChest.get();
 const rest = new REST({ version: '10' }).setToken(Config.token);
 
 const configLogChannelDefinition = new SlashCommandSubcommandBuilder()
@@ -21,7 +20,11 @@ configLogChannelDefinition.addStringOption(
 
 async function configLogChannelExecute(interaction: CommandInteraction) {
     const channelId = interaction.options.getString("channel")
-    const config = serversConfig.getOrCreate(interaction.guildId)
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: "" 
+    }
+    const [config] = await ServersConfig.findOrCreate({where: {serverId: interaction.guildId}, defaults: defaultConfig})
 
     try {
         await rest.get(Routes.channel(channelId));
@@ -31,6 +34,7 @@ async function configLogChannelExecute(interaction: CommandInteraction) {
     }
 
     config.logChannelId = channelId;
+    await config.save()
     await interaction.reply("Log channel has been set.");
 }
 

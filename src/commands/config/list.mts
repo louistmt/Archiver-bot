@@ -1,18 +1,19 @@
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import { CommandInteraction } from "discord.js"
+import { ServersConfig } from "../../services/database.mjs"
 
-import { ServersConfigChest } from "../../data/index.mjs";
-import { multiline } from "../../utils.mjs";
-
-
-const serversConfig = ServersConfigChest.get();
+import { multiline } from "../../utils.mjs"
 
 const listDefinition = new SlashCommandSubcommandBuilder()
 listDefinition.setName("list")
 listDefinition.setDescription("Lists the current configurations of this bot for this server")
 
 async function listExecute(interaction: CommandInteraction) {
-    const config = serversConfig.getOrCreate(interaction.guildId)
+    const defaultConfig = {
+        archiveServerId: "",
+        logChannelId: "" 
+    }
+    const [config] = await ServersConfig.findOrCreate({where: {serverId: interaction.guildId}, defaults: defaultConfig})
 
     await interaction.reply(multiline(
         "```",

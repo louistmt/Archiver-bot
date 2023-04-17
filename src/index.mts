@@ -32,10 +32,10 @@ process.on("SIGINT", singleCallFix(() => {
 async function shutdown() {
     await Tasker.stop()
     client.destroy()
-    // process.exit(0)
+    client.emit("exit")
 }
 
-async function startup() {
+export default async function startup() {
     client.on("interactionCreate", async interaction => {
         if (!interaction.isCommand()) return
         const execute = execsMap.get(interaction.commandName)
@@ -55,6 +55,5 @@ async function startup() {
 
     log("Starting up client")
     await client.login(Config.token)
+    await Tasker.start()
 }
-
-await startup();

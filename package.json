@@ -5,12 +5,13 @@
   "main": "dist/index.mjs",
   "type": "module",
   "scripts": {
-    "start": "node --trace-warnings dist/index.mjs",
+    "start": "node --trace-warnings ./scripts/dist-start.mjs",
+    "replit:start": "node --trace-warnings ./scripts/replit-start.mjs",
     "prebuild": "node ./scripts/build-clear.mjs",
     "build": "npx tsc --outDir ./build",
     "build:deploycmds": "node --trace-warnings ./scripts/build-deploy-cmds.mjs",
-    "test": "npm run build && node --trace-warnings build/index.mjs",
-    "print:classversion": "node ./scripts/print-class-version.mjs",
+    "build:start": "node --trace-warnings ./scripts/build-start.mjs",
+    "test": "npm run build && npm run build:start",
     "predist": "node ./scripts/dist-clear.mjs",
     "dist": "npx tsc",
     "dist:deploycmds": "node --trace-warnings ./scripts/dist-deploy-cmds.mjs"
@@ -36,6 +37,7 @@
     "discord-markdown": "^2.5.1",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
+    "express": "^4.18.2",
     "node-fetch": "^3.3.1",
     "sequelize": "^6.31.0",
     "sqlite3": "^5.1.6"

@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
     const remainderSeconds = remainderMinutes % (1000 * 60)
     const seconds = Math.floor(remainderSeconds / 1000)
 
-    const formatedTime = `${hours >= 10 ? hours : "0" + hours}:${minutes >= 10 ? 10 : "0" + minutes}:${seconds >= 10 ? 10 : "0" + seconds}`
+    const formatedTime = `${hours >= 10 ? hours : "0" + hours}:${minutes >= 10 ? minutes : "0" + minutes}:${seconds >= 10 ? seconds : "0" + seconds}`
     res.type("text/plain").send(`Bot has been on since ${formatedTime}`)
 })
 app.get("/log", (req, res) => {

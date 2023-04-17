@@ -173,7 +173,7 @@ export async function retrieveAllRpMessages(targetChannelId) {
         return {
             avatarUrl: avatarHashToUrl(author.id, author.avatar),
             username: author.username,
-            content: content.trim().length === 0 ? "." : content
+            content
         };
     });
 }
@@ -192,7 +192,7 @@ export async function retrieveAllMessages(targetChannelId) {
         return {
             avatarUrl: avatarHashToUrl(author.id, author.avatar),
             username: author.username,
-            content: content.trim().length === 0 ? "." : content
+            content
         };
     });
 }

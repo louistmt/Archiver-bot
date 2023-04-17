@@ -16,6 +16,8 @@ function addTaskHandlers(...handlers: TaskFunction[]) {
 }
 
 async function start() {
+    log("Started service")
+    
     while (!controller.interrupted) {
         const task = await JobTasks.findOne({order: ["rowid", "ASC"]})
 

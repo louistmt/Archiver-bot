@@ -1,12 +1,9 @@
-import client from "./services/client.mjs";
+import client from "./services/client.mjs"
+import Tasker from "./services/tasker.mjs"
 
-import Archiver from "./workers/archiver.mjs";
-import Exporter from "./workers/exporter/exporter.mjs";
-
-import Config from "./config.mjs";
-import { execsMap } from "./commands/index.mjs";
-import { singleCallFix, preLogs } from "./utils.mjs";
-import { ServersConfigChest } from "./data/index.mjs";
+import Config from "./config.mjs"
+import { execsMap } from "./commands/index.mjs"
+import { singleCallFix, preLogs } from "./utils.mjs"
 
 
 const {log, error} = preLogs("Client");
@@ -33,11 +30,7 @@ process.on("SIGINT", singleCallFix(() => {
 }));
 
 async function shutdown() {
-    await Archiver.shutdown()
-    await Exporter.shutdown()
-    Archiver.save(Config.paths.archiverState)
-    Exporter.save(Config.paths.exporterState)
-    ServersConfigChest.save()
+    await Tasker.stop()
     client.destroy()
     process.exit(0)
 }
@@ -58,10 +51,10 @@ async function startup() {
             error(err)
             await interaction.reply(`There was an error while handling this command.`)
         }
-    });
+    })
 
-    log("Starting up client");
-    await client.login(Config.token);
+    log("Starting up client")
+    await client.login(Config.token)
 }
 
 await startup();

@@ -19,7 +19,7 @@ async function start() {
     log("Started service")
     
     while (!controller.interrupted) {
-        const task = await JobTasks.findOne({order: ["rowid", "ASC"]})
+        const task = await JobTasks.findOne({order: [["rowid", "ASC"]]})
 
         if (task === null) {
             log("Waiting for tasks")
@@ -42,6 +42,7 @@ async function start() {
         }
 
         await task.destroy()
+        if (!(await JobTasks.findOne({where: {jobId}}))) await Jobs.destroy({where: {jobId}})
     }
 
     controller.confirmInterrupt()
@@ -60,7 +61,7 @@ async function addJob(jobId: string, jobName: string, tasks: [TaskFunction, any]
         })
 
         await Jobs.create({jobId, jobName}, {transaction: t})
-        await JobTasks.bulkCreate(tsks, {validate: true})
+        await JobTasks.bulkCreate(tsks, {validate: true, transaction: t})
     })
 }
 
@@ -87,7 +88,7 @@ async function removeJob(jobId: string) {
 }
 
 async function getTasksFor(jobId: string, task: TaskFunction<any>) {
-    return await JobTasks.findAll({where: {jobId, taskName: task.name}, order: ["rowid", "ASC"]})
+    return await JobTasks.findAll({where: {jobId, taskName: task.name}, order: [["rowid", "ASC"]]})
 }
 
 const Tasker: ITasker = {

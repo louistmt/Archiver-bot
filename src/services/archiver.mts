@@ -11,12 +11,7 @@ type ArchiveJob = {
     destCategoryName: string
 }
 
-type CreateDest = {
-    srcChannelId: string
-    destServerId: string
-    destCategoryName: string
-    destChannelName: string
-}
+type CreateDest = ArchiveJob
 
 type GetMsgs = {
     webhookId: string
@@ -37,8 +32,8 @@ type NotifyDone = {
 }
 
 async function createDestTask(jobId: string, data: CreateDest, tasker: ITasker) {
-    const { destServerId, destChannelName, destCategoryName, srcChannelId } = data
-    const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, destChannelName)
+    const { destServerId, srcChannelName, destCategoryName, srcChannelId } = data
+    const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, srcChannelName)
     await tasker.addTasks<GetMsgs>(jobId, getMsgsTask, { srcChannelId, webhookId, webhookToken })
 }
 

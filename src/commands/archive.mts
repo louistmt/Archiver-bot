@@ -35,7 +35,7 @@ async function execute(interaction: CommandInteraction) {
         archiveServerId: "",
         logChannelId: "" 
     }
-    const [config] = await ServersConfig.findOrCreate({where: {serverId: interaction.guildId}, defaults: defaultConfig})
+    const [config] = await ServersConfig.findOrCreate({where: {serverId: srcServerId}, defaults: defaultConfig})
     let {archiveServerId, logChannelId} = config
 
     if (archiveServerId.length === 0 || logChannelId.length === 0) {
@@ -51,7 +51,7 @@ async function execute(interaction: CommandInteraction) {
     }
 
     await Archiver.queue(`archive-${srcChannelId}`, {srcChannelId, srcChannelName, destServerId: archiveServerId, destCategoryName})
-    await interaction.reply(`Queueing ${srcChannelName} for archive in \`\`${destCategoryName}\`\``);
+    await interaction.reply(`Queueing ${srcChannelName} for archive in \`\`${destCategoryName}\`\``)
 
 }
 

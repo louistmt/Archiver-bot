@@ -63,6 +63,7 @@ async function addJob(jobId: string, jobName: string, tasks: [TaskFunction, any]
         await Jobs.create({jobId, jobName}, {transaction: t})
         await JobTasks.bulkCreate(tsks, {validate: true, transaction: t})
     })
+    controller.signal()
 }
 
 async function addTasks<T extends JSONType = any>(jobId: string, task: TaskFunction<T>, ...data: T[]) {
@@ -101,5 +102,4 @@ const Tasker: ITasker = {
     getTasksFor
 };
 
-start()
 export default Tasker;

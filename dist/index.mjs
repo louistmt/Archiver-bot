@@ -46,5 +46,5 @@ export default async function startup() {
     });
     log("Starting up client");
     await client.login(Config.token);
-    await Tasker.start();
+    Tasker.start();
 }

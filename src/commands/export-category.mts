@@ -1,10 +1,9 @@
-import Exporter from "../services/exporter.mjs";
-import { Job } from "../libs/worker-deprecated/index.mjs";
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { PermissionFlagsBits } from "discord-api-types/v9";
-import type { CommandInteraction, GuildBasedChannel } from "discord.js";
-import { Command } from "../libs/cmds.mjs";
-import { retrieveServerInfo } from "../api/archival.mjs";
+import Exporter from "../services/exporter.mjs"
+import { SlashCommandBuilder } from "@discordjs/builders"
+import { PermissionFlagsBits } from "discord-api-types/v9"
+import type { CommandInteraction, GuildBasedChannel } from "discord.js"
+import { Command } from "../libs/cmds.mjs"
+import { retrieveServerInfo } from "../api/archival.mjs"
 
 
 const definition = new SlashCommandBuilder()
@@ -30,13 +29,13 @@ async function execute(interaction: CommandInteraction) {
 
     const category = interaction.options.getChannel("src-category") as GuildBasedChannel
     if (category.type !== "GUILD_CATEGORY") {
-        await interaction.reply(`Channel ${(category as GuildBasedChannel).name} is not a category`);
-        return;
+        await interaction.reply(`Channel ${(category as GuildBasedChannel).name} is not a category`)
+        return
     }
 
     const destChannel = interaction.options.getChannel("dest-channel") as GuildBasedChannel
     if (!destChannel.isText()) {
-        await interaction.reply(`Channel ${(destChannel as GuildBasedChannel).name} is not a text channel`);
+        await interaction.reply(`Channel ${(destChannel as GuildBasedChannel).name} is not a text channel`)
         return;   
     }
 
@@ -51,5 +50,5 @@ async function execute(interaction: CommandInteraction) {
     await interaction.reply(`Queued ${srcChannels.length} to be exported`)
 }
 
-const exportCatCmd: Command = { definition, execute };
+const exportCatCmd: Command = { definition, execute }
 export default exportCatCmd;

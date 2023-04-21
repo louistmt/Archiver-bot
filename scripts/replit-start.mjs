@@ -38,12 +38,12 @@ app.get("/log", (req, res) => {
 })
 
 // Ping repl to try to keep it up at least until the next reset
-setInterval(() => {
-    https.get("https://archiver-bot.luisferreira.repl.co", (res) => {
-        console.log(`Pinged self at ${(new Date()).toUTCString()}`)
-        res.resume()
-    })
-}, 1000 * 60 * 15)
+// setInterval(() => {
+//     https.get("https://archiver-bot.luisferreira.repl.co", (res) => {
+//         console.log(`Pinged self at ${(new Date()).toUTCString()}`)
+//         res.resume()
+//     })
+// }, 1000 * 60 * 15)
 
 // Start up the bot
 await startup()

@@ -12,9 +12,6 @@ const intents = [
 
 const paths = {
     data: process.env["DATA_DIRECTORY"],
-    archiverState: process.env["DATA_DIRECTORY"] + "archiver-state.json",
-    exporterState: process.env["DATA_DIRECTORY"] + "exporter-state.json",
-    serversConfig: process.env["DATA_DIRECTORY"] + "servers-config.json",
     sqlite3: process.env["DATA_DIRECTORY"] + "db.sqlite3"
 };
 

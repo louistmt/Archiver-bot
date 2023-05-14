@@ -1,5 +1,5 @@
 import { JobTasks, Jobs, sequelize } from "./database.mjs";
-import { Controller } from "../libs/tasker-interfaces.mjs";
+import { Controller } from "../libs/interfaces/tasker.mjs";
 import { preLogs } from "../utils.mjs";
 const { log, error } = preLogs("Tasker");
 const handlerMap = new Map();

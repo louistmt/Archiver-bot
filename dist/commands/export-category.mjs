@@ -1,7 +1,7 @@
 import Exporter from "../services/exporter.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
-import { retrieveServerInfo } from "../api/archival.mjs";
+import { retrieveServerInfo } from "../api-deprecated/archival.mjs";
 const definition = new SlashCommandBuilder();
 definition.setName("export-category");
 definition.setDescription("Exports a whole category of channels as web pages into a destination channel");

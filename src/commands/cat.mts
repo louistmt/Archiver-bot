@@ -1,10 +1,10 @@
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { CommandInteraction } from "discord.js"
+import { ChatInputCommandInteraction } from "discord.js"
 import { Command, produceSubExecsMap } from "../libs/cmds.mjs"
 
 import Config from "../config.mjs"
-import { retrieveArchiveData } from "../api-deprecated/archival.mjs"
-import { createChannel } from "../api-deprecated/channels.mjs"
+import { retrieveArchiveData } from "../api/archival.mjs"
+import { createChannel } from "../api/channels.mjs"
 import { ServersConfig } from "../services/database.mjs"
 import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10"
 
@@ -19,7 +19,7 @@ catAddDefinition.addStringOption(option =>
         .setDescription("The name of the category")
         .setRequired(true))
 
-async function executeCatAdd(interaction: CommandInteraction) {
+async function executeCatAdd(interaction: ChatInputCommandInteraction) {
     const categoryName = interaction.options.getString("name")
     const serverId = interaction.guildId
     const defaultConfig = {
@@ -58,7 +58,7 @@ const catListDefinition = new SlashCommandSubcommandBuilder()
 catListDefinition.setName("list")
 catListDefinition.setDescription("Replies with info regarding the archive server")
 
-async function executeCatList(interaction: CommandInteraction) {
+async function executeCatList(interaction: ChatInputCommandInteraction) {
     const serverId = interaction.guildId
     const defaultConfig = {
         archiveServerId: "",
@@ -100,7 +100,7 @@ definition.addSubcommand(catListDefinition)
 definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 definition.setDMPermission(false)
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
     await subExecsMap.get(interaction.options.getSubcommand())(interaction)
 }
 

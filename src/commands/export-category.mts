@@ -1,9 +1,9 @@
 import Exporter from "../services/exporter.mjs"
 import { SlashCommandBuilder } from "@discordjs/builders"
-import { PermissionFlagsBits } from "discord-api-types/v9"
-import type { CommandInteraction, GuildBasedChannel } from "discord.js"
+import { ChannelType, PermissionFlagsBits } from "discord-api-types/v10"
+import type { ChatInputCommandInteraction, GuildBasedChannel } from "discord.js"
 import { Command } from "../libs/cmds.mjs"
-import { retrieveServerInfo } from "../api-deprecated/archival.mjs"
+import { retrieveServerInfo } from "../api/archival.mjs"
 
 
 const definition = new SlashCommandBuilder()
@@ -25,16 +25,16 @@ definition.addChannelOption((option) => {
 })
 
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
 
     const category = interaction.options.getChannel("src-category") as GuildBasedChannel
-    if (category.type !== "GUILD_CATEGORY") {
+    if (category.type !== ChannelType.GuildCategory) {
         await interaction.reply(`Channel ${(category as GuildBasedChannel).name} is not a category`)
         return
     }
 
     const destChannel = interaction.options.getChannel("dest-channel") as GuildBasedChannel
-    if (!destChannel.isText()) {
+    if (!destChannel.isTextBased()) {
         await interaction.reply(`Channel ${(destChannel as GuildBasedChannel).name} is not a text channel`)
         return;   
     }

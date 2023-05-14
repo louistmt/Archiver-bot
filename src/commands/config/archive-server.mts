@@ -1,5 +1,5 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { CommandInteraction } from "discord.js"
+import { ChatInputCommandInteraction } from "discord.js"
 import { PermissionFlagsBits } from "discord-api-types/v10"
 import { ServersConfig } from "../../services/database.mjs"
 
@@ -12,7 +12,7 @@ configArchiveDefinition.addStringOption(
                     .setRequired(true)
 )
 
-async function configArchiveExecute(interaction: CommandInteraction) {
+async function configArchiveExecute(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.options.getString("server-id")
     const userId = interaction.member.user.id;
     const defaultConfig = {

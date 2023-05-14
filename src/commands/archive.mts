@@ -1,12 +1,12 @@
-import { getChannel } from "../api-deprecated/channels.mjs"
+import { getChannel } from "../api/channels.mjs"
 import { ServersConfig } from "../services/database.mjs"
 import Archiver from "../services/archiver.mjs"
 import { SlashCommandBuilder } from "@discordjs/builders"
 import { PermissionFlagsBits } from "discord-api-types/v10"
-import type { CommandInteraction } from "discord.js"
+import type { ChatInputCommandInteraction } from "discord.js"
 import { preLogs } from "../utils.mjs"
 import { Command } from "../libs/cmds.mjs"
-import { retrieveArchiveData } from "../api-deprecated/archival.mjs"
+import { retrieveArchiveData } from "../api/archival.mjs"
 
 const { log } = preLogs("Archive")
 
@@ -24,7 +24,7 @@ definition.setName("archive")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false)
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
     log("Received interaction");
 
     const srcServerId = interaction.guildId

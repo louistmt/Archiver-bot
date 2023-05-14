@@ -1,5 +1,5 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { CommandInteraction } from "discord.js"
+import { ChatInputCommandInteraction } from "discord.js"
 import Exporter from "../../services/exporter.mjs"
 
 
@@ -17,7 +17,7 @@ exportWebPageDefinition.addChannelOption(
                     .setRequired(true)
 )
 
-async function exportWebPageExecute(interaction: CommandInteraction) {
+async function exportWebPageExecute(interaction: ChatInputCommandInteraction) {
     const srcChannel = interaction.options.getChannel("src-channel")
     const srcChannelId = srcChannel.id
     const srcChannelName = srcChannel.name

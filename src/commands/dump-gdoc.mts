@@ -2,10 +2,10 @@ import { Command } from "../libs/cmds.mjs"
 import { SlashCommandBuilder } from "@discordjs/builders"
 import { PermissionFlagsBits } from "discord-api-types/v9"
 import Config from "../config.mjs"
-import type { CommandInteraction } from "discord.js"
+import type { ChatInputCommandInteraction } from "discord.js"
 import fetch from "node-fetch"
 import { delay } from "../utils.mjs"
-import { postMessage } from "../api-deprecated/channels.mjs"
+import { postMessage } from "../api/channels.mjs"
 
 const googleScriptUrl = `https://script.google.com/macros/s/${Config.googleScriptId}/exec`
 
@@ -27,7 +27,7 @@ function extractDocIdFromUrl(docUrl: string) {
     return docUrl.replace("https://docs.google.com/document/d/", "").replace(editRegex, "")
 }
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
     const docUrl = interaction.options.getString("doc-url")
     const channelId = interaction.channelId
     const docId = extractDocIdFromUrl(docUrl)

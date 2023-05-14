@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v10";
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, CommandInteraction } from "discord.js";
 
 import { Command, produceSubExecsMap } from "../../libs/cmds.mjs";
 import { exportJsonDefinition, exportJsonExecute } from "./json.mjs";
@@ -19,7 +19,7 @@ definition.addSubcommand(exportWebPageDefinition)
 definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 definition.setDMPermission(false)
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
     await subExecsMap.get(interaction.options.getSubcommand())(interaction)
 }
 

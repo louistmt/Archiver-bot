@@ -1,5 +1,5 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { CommandInteraction } from "discord.js"
+import { ChatInputCommandInteraction } from "discord.js"
 import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v10"
 import { ServersConfig } from "../../services/database.mjs"
@@ -18,7 +18,7 @@ configLogChannelDefinition.addStringOption(
                     .setRequired(true)
 )
 
-async function configLogChannelExecute(interaction: CommandInteraction) {
+async function configLogChannelExecute(interaction: ChatInputCommandInteraction) {
     const channelId = interaction.options.getString("channel")
     const defaultConfig = {
         archiveServerId: "",

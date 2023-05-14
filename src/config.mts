@@ -1,13 +1,13 @@
 import "dotenv/config"; // Load configuration variables into process.env
 import * as url from "url";
-import {Intents} from "discord.js";
+import {GatewayIntentBits} from "discord.js";
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const intents = [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_WEBHOOKS
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers
 ];
 
 const paths = {

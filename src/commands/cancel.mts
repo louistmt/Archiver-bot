@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v9";
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { Command } from "../libs/cmds.mjs";
 import Archiver from "../services/archiver.mjs";
 
@@ -15,7 +15,7 @@ definition.addChannelOption(option =>
 definition.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 definition.setDMPermission(false)
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
     const channelId = interaction.options.getChannel("channel").id
     await Archiver.dequeue(`archive-${channelId}`)
     await interaction.reply(`Canceled job.`)

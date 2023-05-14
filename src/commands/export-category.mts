@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "@discordjs/builders"
 import { ChannelType, PermissionFlagsBits } from "discord-api-types/v10"
 import type { ChatInputCommandInteraction, GuildBasedChannel } from "discord.js"
 import { Command } from "../libs/cmds.mjs"
-import { retrieveServerInfo } from "../api/archival.mjs"
+import { retrieveServerInfo } from "../services/archival.mjs"
 
 
 const definition = new SlashCommandBuilder()

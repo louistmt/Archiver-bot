@@ -3,10 +3,10 @@ import { ChatInputCommandInteraction } from "discord.js"
 import { Command, produceSubExecsMap } from "../libs/cmds.mjs"
 
 import Config from "../config.mjs"
-import { retrieveArchiveData } from "../api/archival.mjs"
-import { createChannel } from "../api/channels.mjs"
 import { ServersConfig } from "../services/database.mjs"
 import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10"
+import { retrieveServerInfo } from "../services/archival.mjs"
+import client from "../services/client.mjs"
 
 
 
@@ -34,7 +34,7 @@ async function executeCatAdd(interaction: ChatInputCommandInteraction) {
         archiveServerId = serverId;
     }
 
-    const archiveServer = await retrieveArchiveData(archiveServerId)
+    const archiveServer = await retrieveServerInfo(archiveServerId)
 
     if (archiveServer.channelCount >= Config.archiveLimit) {
         await interaction.reply(`Archive server is full. Delete some channels or change archive server.`)
@@ -46,7 +46,8 @@ async function executeCatAdd(interaction: ChatInputCommandInteraction) {
         return
     }
 
-    await createChannel(archiveServerId, categoryName, ChannelType.GuildCategory)
+    const archiveGuild = await client.guilds.fetch(archiveServerId)
+    await archiveGuild.channels.create({name: categoryName, type: ChannelType.GuildCategory})
     await interaction.reply(`Created new category \`\`${categoryName}\`\``)
 }
 
@@ -71,12 +72,12 @@ async function executeCatList(interaction: ChatInputCommandInteraction) {
         archiveServerId = serverId
     }
 
-    const archiveServer = await retrieveArchiveData(archiveServerId)
+    const archiveServer = await retrieveServerInfo(archiveServerId)
     let reply = "**Archive Status**\n_ _\n_ _\n"
 
     reply += `\`\`Archive Capacity: ${archiveServer.channelCount}/${Config.archiveLimit} channels\`\`\n\n`
 
-    for (let [category, channels] of archiveServer.categories) {
+    for (let [category, channels] of archiveServer.catTextChannels) {
         reply += `\`\`${category} Capacity: ${channels.length}/${Config.categoryLimit} channels\`\`\n`
     }
 

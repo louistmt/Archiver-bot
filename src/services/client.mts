@@ -1,29 +1,32 @@
-import { ActivityType, Client } from "discord.js";
-import Config from "../config.mjs";
-import { preLogs } from "../utils.mjs";
+import { ActivityType, Client } from "discord.js"
+import Config from "../config.mjs"
+import { preLogs } from "../utils.mjs"
 
-const { log, error } = preLogs("Client");
+const { log, error } = preLogs("Client")
 
-const client = new Client(Config.clientOptions);
-client.token = Config.token;
-client.on("error", error);
+const client = new Client(Config.clientOptions)
+client.token = Config.token
+client.on("error", (err) => {
+    error(err)
+    client.emit("exit")
+})
 
 client.once("ready", () => {
-    log("Bot is online");
-    client.user.setActivity("the servant", { type: ActivityType.Playing });
-});
+    log("Bot is online")
+    client.user.setActivity("the servant", { type: ActivityType.Playing })
+})
 client.on("shardDisconnect", () => {
-    log("Lost connection");
-});
-client.on("shardError", error);
+    log("Lost connection")
+})
+client.on("shardError", error)
 client.on("shardReady", () => {
-    log("Connection Ready");
-});
+    log("Connection Ready")
+})
 client.on("shardReconnecting", () => {
-    log("Reconnecting shard");
-});
+    log("Reconnecting shard")
+})
 client.on("shardResume", () => {
-    log("Connection resumed");
-});
+    log("Connection resumed")
+})
 
-export default client;
+export default client

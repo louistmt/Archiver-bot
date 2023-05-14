@@ -6,8 +6,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const intents = [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMembers
+    GatewayIntentBits.GuildMessages
 ];
 
 const paths = {

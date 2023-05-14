@@ -1,10 +1,10 @@
-import { getChannel } from "../api/channels.mjs";
+import { getChannel } from "../api-deprecated/channels.mjs";
 import { ServersConfig } from "../services/database.mjs";
 import Archiver from "../services/archiver.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v10";
 import { preLogs } from "../utils.mjs";
-import { retrieveArchiveData } from "../api/archival.mjs";
+import { retrieveArchiveData } from "../api-deprecated/archival.mjs";
 const { log } = preLogs("Archive");
 const definition = new SlashCommandBuilder();
 definition.setName("archive")

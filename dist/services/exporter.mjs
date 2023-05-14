@@ -1,6 +1,6 @@
 import Tasker from "./tasker.mjs";
-import { retrieveAllMessages } from "../api/archival.mjs";
-import { postMessage } from "../api/channels.mjs";
+import { retrieveAllMessages } from "../api-deprecated/archival.mjs";
+import { postMessage } from "../api-deprecated/channels.mjs";
 import { capitalize } from "../utils.mjs";
 import { MessageAttachment } from "discord.js";
 import client from "./client.mjs";

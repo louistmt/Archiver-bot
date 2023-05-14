@@ -3,7 +3,7 @@ import { PermissionFlagsBits } from "discord-api-types/v9";
 import Config from "../config.mjs";
 import fetch from "node-fetch";
 import { delay } from "../utils.mjs";
-import { postMessage } from "../api/channels.mjs";
+import { postMessage } from "../api-deprecated/channels.mjs";
 const googleScriptUrl = `https://script.google.com/macros/s/${Config.googleScriptId}/exec`;
 const definition = new SlashCommandBuilder();
 definition.setName("dump-gdoc");

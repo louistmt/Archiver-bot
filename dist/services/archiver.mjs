@@ -1,7 +1,7 @@
 import Tasker from "./tasker.mjs";
-import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
-import { postMessageToWebhook } from "../api/webhooks.mjs";
-import { postMessage } from "../api/channels.mjs";
+import { createArchiveChannel, retrieveAllMessages } from "../api-deprecated/archival.mjs";
+import { postMessageToWebhook } from "../api-deprecated/webhooks.mjs";
+import { postMessage } from "../api-deprecated/channels.mjs";
 async function createDestTask(jobId, data, tasker) {
     const { destServerId, srcChannelName, destCategoryName, srcChannelId } = data;
     const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, srcChannelName);

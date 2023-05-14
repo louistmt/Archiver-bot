@@ -1,8 +1,8 @@
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { produceSubExecsMap } from "../libs/cmds.mjs";
 import Config from "../config.mjs";
-import { retrieveArchiveData } from "../api/archival.mjs";
-import { createChannel } from "../api/channels.mjs";
+import { retrieveArchiveData } from "../api-deprecated/archival.mjs";
+import { createChannel } from "../api-deprecated/channels.mjs";
 import { ServersConfig } from "../services/database.mjs";
 import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10";
 const catAddDefinition = new SlashCommandSubcommandBuilder();

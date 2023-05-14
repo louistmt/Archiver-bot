@@ -3,7 +3,7 @@ import { PermissionFlagsBits } from "discord-api-types/v9";
 import Config from "../config.mjs";
 import fetch from "node-fetch";
 import { delay } from "../utils.mjs";
-import { postMessage } from "../api-deprecated/channels.mjs";
+import client from "../services/client.mjs";
 const googleScriptUrl = `https://script.google.com/macros/s/${Config.googleScriptId}/exec`;
 const definition = new SlashCommandBuilder();
 definition.setName("dump-gdoc");
@@ -21,7 +21,7 @@ function extractDocIdFromUrl(docUrl) {
 }
 async function execute(interaction) {
     const docUrl = interaction.options.getString("doc-url");
-    const channelId = interaction.channelId;
+    const channel = await client.channels.fetch(interaction.channelId);
     const docId = extractDocIdFromUrl(docUrl);
     const response = await fetch(`${googleScriptUrl}?docId=${docId}`);
     if (!response.ok) {
@@ -32,7 +32,7 @@ async function execute(interaction) {
     const messages = await response.json();
     for (let msg of messages) {
         await delay(3 * 1000);
-        await postMessage(channelId, msg);
+        await channel.send(msg);
     }
 }
 const dumpGDocCmd = { definition, execute };

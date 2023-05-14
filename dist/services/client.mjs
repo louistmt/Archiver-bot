@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { ActivityType, Client } from "discord.js";
 import Config from "../config.mjs";
 import { preLogs } from "../utils.mjs";
 const { log, error } = preLogs("Client");
@@ -7,7 +7,7 @@ client.token = Config.token;
 client.on("error", error);
 client.once("ready", () => {
     log("Bot is online");
-    client.user.setActivity("the servant", { type: "PLAYING" });
+    client.user.setActivity("the servant", { type: ActivityType.Playing });
 });
 client.on("shardDisconnect", () => {
     log("Lost connection");

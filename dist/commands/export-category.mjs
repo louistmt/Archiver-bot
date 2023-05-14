@@ -1,7 +1,7 @@
 import Exporter from "../services/exporter.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { PermissionFlagsBits } from "discord-api-types/v9";
-import { retrieveServerInfo } from "../api-deprecated/archival.mjs";
+import { ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+import { retrieveServerInfo } from "../services/archival.mjs";
 const definition = new SlashCommandBuilder();
 definition.setName("export-category");
 definition.setDescription("Exports a whole category of channels as web pages into a destination channel");
@@ -21,12 +21,12 @@ definition.addChannelOption((option) => {
 });
 async function execute(interaction) {
     const category = interaction.options.getChannel("src-category");
-    if (category.type !== "GUILD_CATEGORY") {
+    if (category.type !== ChannelType.GuildCategory) {
         await interaction.reply(`Channel ${category.name} is not a category`);
         return;
     }
     const destChannel = interaction.options.getChannel("dest-channel");
-    if (!destChannel.isText()) {
+    if (!destChannel.isTextBased()) {
         await interaction.reply(`Channel ${destChannel.name} is not a text channel`);
         return;
     }

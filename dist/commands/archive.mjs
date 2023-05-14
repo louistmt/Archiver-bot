@@ -1,10 +1,9 @@
-import { getChannel } from "../api-deprecated/channels.mjs";
 import { ServersConfig } from "../services/database.mjs";
 import Archiver from "../services/archiver.mjs";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { PermissionFlagsBits } from "discord-api-types/v10";
 import { preLogs } from "../utils.mjs";
-import { retrieveArchiveData } from "../api-deprecated/archival.mjs";
+import { retrieveServerInfo } from "../services/archival.mjs";
 const { log } = preLogs("Archive");
 const definition = new SlashCommandBuilder();
 definition.setName("archive")
@@ -20,8 +19,9 @@ definition.setName("archive")
 async function execute(interaction) {
     log("Received interaction");
     const srcServerId = interaction.guildId;
-    const srcChannelId = interaction.options.getChannel("channel").id;
-    const srcChannelName = (await getChannel(srcChannelId)).name;
+    const srcChannel = interaction.options.getChannel("channel");
+    const srcChannelId = srcChannel.id;
+    const srcChannelName = srcChannel.name;
     const destCategoryName = interaction.options.getString("category");
     const defaultConfig = {
         archiveServerId: "",
@@ -33,7 +33,7 @@ async function execute(interaction) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. Archive server is not yet configured.`);
         return;
     }
-    const { catNamesIds } = await retrieveArchiveData(archiveServerId);
+    const { catNamesIds } = await retrieveServerInfo(archiveServerId);
     if (!catNamesIds.has(destCategoryName)) {
         await interaction.reply(`Couldn't queue ${srcChannelName} for archive. The category '${destCategoryName}' does not exist`);
         return;

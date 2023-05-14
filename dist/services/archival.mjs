@@ -2,13 +2,13 @@
  * Sub module containing the more complex API calls which
  * are composed of several subcalls
  */
-import * as ChannelsAPI from "./channels.mjs";
-import * as WebhooksAPI from "./webhooks.mjs";
 import { avatarHashToUrl } from "../utils.mjs";
 import { ChannelType } from "discord-api-types/v10";
-const ARCHIVE_LIMIT = 500;
-const CATEGORY_LIMIT = 50;
-export class ArchivalError extends Error {
+import Config from "../config.mjs";
+import client from "./client.mjs";
+const ARCHIVE_LIMIT = Config.archiveLimit;
+const CATEGORY_LIMIT = Config.categoryLimit;
+class ArchivalError extends Error {
     static REPEATED_CATEGORIES = 2;
     static FULL = 3;
     static CATEGORY_FULL = 4;
@@ -24,6 +24,7 @@ export class ArchivalError extends Error {
         this.type = type;
     }
 }
+export { ArchivalError };
 class ServerChannelsInfo {
     /**
      * Total number of channes in the server
@@ -47,54 +48,23 @@ class ServerChannelsInfo {
 }
 export async function retrieveServerInfo(guildId) {
     const serverInfo = new ServerChannelsInfo();
-    const channels = await ChannelsAPI.getChannels(guildId);
+    const guild = await client.guilds.fetch(guildId);
+    const channels = (await guild.channels.fetch()).map((value) => value);
     const textChannels = channels.filter((channel) => channel.type === ChannelType.GuildText);
     const categoryChannels = channels.filter((channel) => channel.type === ChannelType.GuildCategory);
     serverInfo.channelCount = channels.length;
     textChannels.forEach((channel) => {
-        if (!channel.parent_id)
+        if (!channel.parentId)
             return;
-        if (!serverInfo.catTextChannels.has(channel.parent_id))
-            serverInfo.catTextChannels.set(channel.parent_id, []);
-        serverInfo.catTextChannels.get(channel.parent_id).push(channel);
+        if (!serverInfo.catTextChannels.has(channel.parentId))
+            serverInfo.catTextChannels.set(channel.parentId, []);
+        serverInfo.catTextChannels.get(channel.parentId).push(channel);
     });
     categoryChannels.forEach((channel) => {
         serverInfo.catChannels.set(channel.id, channel);
         serverInfo.catNamesIds.set(channel.name, channel.id);
     });
     return serverInfo;
-}
-/**
- * Retriveves and parses the Archive Data into a format
- * @param guildId
- * @throws {ArchivalError} When there is a network error or if there are repeated categories
- */
-export async function retrieveArchiveData(guildId) {
-    const channels = await ChannelsAPI.getChannels(guildId);
-    const catData = channels.filter((channel) => channel.type === ChannelType.GuildCategory);
-    const chaData = channels.filter((channel) => channel.type === ChannelType.GuildText);
-    const catIdsNames = new Map();
-    const catNamesIds = new Map();
-    for (let { id, name } of catData) {
-        if (catNamesIds.has(name)) {
-            throw new ArchivalError(ArchivalError.REPEATED_CATEGORIES, `Found repeated categories for name "${name}"`);
-        }
-        catNamesIds.set(name, id);
-        catIdsNames.set(id, name);
-    }
-    const channelCount = catData.length + chaData.length;
-    const categories = new Map();
-    for (let { id } of catData) {
-        const catName = catIdsNames.get(id);
-        categories.set(catName, []);
-    }
-    for (let { id, parent_id } of chaData) {
-        if (!parent_id)
-            continue;
-        const catName = catIdsNames.get(parent_id);
-        categories.get(catName).push(id);
-    }
-    return { channelCount, categories, catNamesIds };
 }
 /**
  * Creates an archival channel.
@@ -108,17 +78,18 @@ export async function retrieveArchiveData(guildId) {
  */
 export async function createArchiveChannel(guildId, categoryName, channelName) {
     // Retrieve archive server info
-    const archiveServer = await retrieveArchiveData(guildId);
+    const archiveServer = await retrieveServerInfo(guildId);
     if (archiveServer.channelCount == ARCHIVE_LIMIT)
         throw new ArchivalError(ArchivalError.FULL, "The archival server is full");
     if (!archiveServer.catNamesIds.has(categoryName))
         throw new ArchivalError(ArchivalError.NO_CATEGORY, `Category "${categoryName}" does not exist`);
-    if (archiveServer.categories.get(categoryName).length === CATEGORY_LIMIT)
+    if (archiveServer.catTextChannels.get(categoryName).length === CATEGORY_LIMIT)
         throw new ArchivalError(ArchivalError.CATEGORY_FULL, `Category "${categoryName}" is full`);
     const categoryId = archiveServer.catNamesIds.get(categoryName);
-    const channel = await ChannelsAPI.createChannel(guildId, channelName, ChannelType.GuildText, categoryId);
+    const guild = await client.guilds.fetch(guildId);
+    const channel = await guild.channels.create({ name: channelName, parent: categoryId, type: ChannelType.GuildText });
     const channelId = channel.id;
-    const webhook = await WebhooksAPI.createWebhook(channelId, channel.name);
+    const webhook = await channel.createWebhook({ name: channelName });
     const webhookId = webhook.id;
     const webhookToken = webhook.token;
     return { channelId, webhookId, webhookToken };
@@ -130,7 +101,22 @@ const mentionsRegex = /<@.*?>/gm;
  * @returns {{avatarUrl: string, username: string, content: string}[]} The Rp messages
  */
 export async function retrieveAllRpMessages(targetChannelId) {
-    return (await ChannelsAPI.getAllWebhookMessages(targetChannelId)).map(({ author, content }) => {
+    const channel = await client.channels.fetch(targetChannelId);
+    const rawMessages = [];
+    if (!channel.isTextBased())
+        return [];
+    let lastMsgCount = Infinity;
+    let lastId = channel.lastMessageId;
+    while (lastMsgCount > 0) {
+        // @ts-ignore: This expression is not callable
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        lastMsgCount = msgs.length;
+        lastId = msgs[msgs.length - 1].id;
+        rawMessages.push(...msgs);
+    }
+    return rawMessages
+        .filter(msg => msg.webhookId !== undefined)
+        .map(({ author, content }) => {
         content = content.trim().length === 0 ? "." : content;
         content = content.replaceAll(mentionsRegex, ".");
         return {
@@ -140,13 +126,21 @@ export async function retrieveAllRpMessages(targetChannelId) {
         };
     });
 }
-/**
- * Retrieves all messages in a tidy format ready to be sent.
- * @param {string} targetChannelId The channel to retrieve the messages from
- * @returns {{avatarUrl: string, username: string, content: string}[]} The Messages
- */
 export async function retrieveAllMessages(targetChannelId) {
-    return (await ChannelsAPI.getAllChannelMessages(targetChannelId)).map(({ author, content }) => {
+    const channel = await client.channels.fetch(targetChannelId);
+    const rawMessages = [];
+    if (!channel.isTextBased())
+        return [];
+    let lastMsgCount = Infinity;
+    let lastId = channel.lastMessageId;
+    while (lastMsgCount > 0) {
+        // @ts-ignore: This expression is not callable
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        lastMsgCount = msgs.length;
+        lastId = msgs[msgs.length - 1].id;
+        rawMessages.push(...msgs);
+    }
+    return rawMessages.map(({ author, content }) => {
         content = content.trim().length === 0 ? "." : content;
         content = content.replaceAll(mentionsRegex, ".");
         return {

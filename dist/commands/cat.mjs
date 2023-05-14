@@ -1,10 +1,10 @@
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/builders";
 import { produceSubExecsMap } from "../libs/cmds.mjs";
 import Config from "../config.mjs";
-import { retrieveArchiveData } from "../api-deprecated/archival.mjs";
-import { createChannel } from "../api-deprecated/channels.mjs";
 import { ServersConfig } from "../services/database.mjs";
 import { PermissionFlagsBits, ChannelType } from "discord-api-types/v10";
+import { retrieveServerInfo } from "../services/archival.mjs";
+import client from "../services/client.mjs";
 const catAddDefinition = new SlashCommandSubcommandBuilder();
 catAddDefinition.setName("add");
 catAddDefinition.setDescription("Adds a category to the archive server with the specified name");
@@ -23,7 +23,7 @@ async function executeCatAdd(interaction) {
     if (archiveServerId.length === 0) {
         archiveServerId = serverId;
     }
-    const archiveServer = await retrieveArchiveData(archiveServerId);
+    const archiveServer = await retrieveServerInfo(archiveServerId);
     if (archiveServer.channelCount >= Config.archiveLimit) {
         await interaction.reply(`Archive server is full. Delete some channels or change archive server.`);
         return;
@@ -32,7 +32,8 @@ async function executeCatAdd(interaction) {
         await interaction.reply(`Category ${categoryName} already exists.`);
         return;
     }
-    await createChannel(archiveServerId, categoryName, ChannelType.GuildCategory);
+    const archiveGuild = await client.guilds.fetch(archiveServerId);
+    await archiveGuild.channels.create({ name: categoryName, type: ChannelType.GuildCategory });
     await interaction.reply(`Created new category \`\`${categoryName}\`\``);
 }
 const catListDefinition = new SlashCommandSubcommandBuilder();
@@ -49,10 +50,10 @@ async function executeCatList(interaction) {
     if (archiveServerId.length === 0) {
         archiveServerId = serverId;
     }
-    const archiveServer = await retrieveArchiveData(archiveServerId);
+    const archiveServer = await retrieveServerInfo(archiveServerId);
     let reply = "**Archive Status**\n_ _\n_ _\n";
     reply += `\`\`Archive Capacity: ${archiveServer.channelCount}/${Config.archiveLimit} channels\`\`\n\n`;
-    for (let [category, channels] of archiveServer.categories) {
+    for (let [category, channels] of archiveServer.catTextChannels) {
         reply += `\`\`${category} Capacity: ${channels.length}/${Config.categoryLimit} channels\`\`\n`;
     }
     await interaction.reply(reply);

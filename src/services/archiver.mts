@@ -1,8 +1,8 @@
 import type { IJobQueue, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs";
 import Tasker from "./tasker.mjs";
-import { createArchiveChannel, retrieveAllMessages } from "../api-deprecated/archival.mjs";
-import { postMessageToWebhook } from "../api-deprecated/webhooks.mjs";
-import { postMessage } from "../api-deprecated/channels.mjs";
+import { createArchiveChannel, retrieveAllMessages } from "./archival.mjs";
+import client from "./client.mjs";
+import { TextChannel } from "discord.js";
 
 type ArchiveJob = {
     srcChannelId: string
@@ -49,12 +49,14 @@ async function getMsgsTask(jobId: string, data: GetMsgs, tasker: ITasker) {
 
 export async function sendMsgTask(jobId: string, data: SendMsg, tasker: ITasker) {
     const { webhookId, webhookToken, avatarUrl, content, username } = data
-    await postMessageToWebhook(webhookId, webhookToken, avatarUrl, username, content)
+    const webhook = await client.fetchWebhook(webhookId, webhookToken)
+    webhook.send({avatarURL: avatarUrl, content, username})
 }
 
 export async function notifyDoneTask(jobId: string, data: NotifyDone, tasker: ITasker) {
     const { srcChannelId } = data
-    await postMessage(srcChannelId, `Done archiving this channel. You can delete it now`)
+    const channel = await client.channels.fetch(srcChannelId) as TextChannel
+    await channel.send("Done archiving this channel. You can delete it now")
 }
 
 Tasker.addTaskHandlers(

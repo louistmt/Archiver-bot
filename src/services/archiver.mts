@@ -1,8 +1,8 @@
 import type { IJobQueue, ITasker, TaskFunction } from "../libs/tasker-interfaces.mjs";
 import Tasker from "./tasker.mjs";
-import { createArchiveChannel, retrieveAllMessages } from "../api/archival.mjs";
-import { postMessageToWebhook } from "../api/webhooks.mjs";
-import { postMessage } from "../api/channels.mjs";
+import { createArchiveChannel, retrieveAllMessages } from "../api-deprecated/archival.mjs";
+import { postMessageToWebhook } from "../api-deprecated/webhooks.mjs";
+import { postMessage } from "../api-deprecated/channels.mjs";
 
 type ArchiveJob = {
     srcChannelId: string

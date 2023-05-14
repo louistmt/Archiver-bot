@@ -5,7 +5,7 @@ import Config from "../config.mjs"
 import type { CommandInteraction } from "discord.js"
 import fetch from "node-fetch"
 import { delay } from "../utils.mjs"
-import { postMessage } from "../api/channels.mjs"
+import { postMessage } from "../api-deprecated/channels.mjs"
 
 const googleScriptUrl = `https://script.google.com/macros/s/${Config.googleScriptId}/exec`
 

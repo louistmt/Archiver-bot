@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "@discordjs/builders"
 import { PermissionFlagsBits } from "discord-api-types/v9"
 import type { CommandInteraction, GuildBasedChannel } from "discord.js"
 import { Command } from "../libs/cmds.mjs"
-import { retrieveServerInfo } from "../api/archival.mjs"
+import { retrieveServerInfo } from "../api-deprecated/archival.mjs"
 
 
 const definition = new SlashCommandBuilder()

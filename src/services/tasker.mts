@@ -1,5 +1,5 @@
 import { JobTasks, Jobs, sequelize } from "./database.mjs";
-import { Controller, ITasker, TaskFunction } from "../libs/tasker-interfaces.mjs";
+import { Controller, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs";
 import { JSONType } from "../libs/common.mjs";
 import { preLogs } from "../utils.mjs";
 

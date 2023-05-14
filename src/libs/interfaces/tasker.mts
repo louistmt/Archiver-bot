@@ -1,4 +1,4 @@
-import { JSONType } from "./common.mjs";
+import { JSONType } from "../common.mjs";
 
 /**
  * Generic interface to define a job queue. This is

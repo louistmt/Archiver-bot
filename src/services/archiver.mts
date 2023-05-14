@@ -1,4 +1,4 @@
-import type { IJobQueue, ITasker, TaskFunction } from "../libs/tasker-interfaces.mjs";
+import type { IJobQueue, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs";
 import Tasker from "./tasker.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "../api-deprecated/archival.mjs";
 import { postMessageToWebhook } from "../api-deprecated/webhooks.mjs";

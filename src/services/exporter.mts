@@ -1,5 +1,5 @@
 import Tasker from "./tasker.mjs"
-import type { IJobQueue, ITasker, TaskFunction } from "../libs/tasker-interfaces.mjs"
+import type { IJobQueue, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs"
 import { retrieveAllMessages } from "../api-deprecated/archival.mjs"
 import { postMessage } from "../api-deprecated/channels.mjs"
 import { capitalize } from "../utils.mjs"

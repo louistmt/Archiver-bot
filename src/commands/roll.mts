@@ -44,7 +44,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
     const sum = parseInt(sumStr)
 
     for (let i = 0; i < count; i++) {
-        result.push(Math.floor(Math.random() * (die + 1)) + sum)
+        result.push(Math.floor(Math.random() * die) + 1 + sum)
     }
 
     await interaction.reply({

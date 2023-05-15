@@ -101,6 +101,8 @@ export async function retrieveAllBotMessages(targetId) {
         await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
         const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        if (msgs.length === 0)
+            break;
         lastMsgCount = msgs.length;
         lastId = msgs[msgs.length - 1].id;
         rawMessages.push(...msgs);
@@ -129,6 +131,8 @@ export async function retrieveAllMessages(targetId) {
         await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
         const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        if (msgs.length === 0)
+            break;
         lastMsgCount = msgs.length;
         lastId = msgs[msgs.length - 1].id;
         rawMessages.push(...msgs);
@@ -157,6 +161,8 @@ export async function retrieveMessagesRange(targetId, startId, stopId) {
         lastMsgCount = 0;
         // @ts-ignore: This expression is not callable
         const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        if (msgs.length === 0)
+            break;
         for (let msg of msgs) {
             lastMsgCount += 1;
             rawMessages.push(msg);

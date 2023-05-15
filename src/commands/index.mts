@@ -6,6 +6,7 @@ import configCmd from "./config/index.mjs"
 import exportCmd from "./export/index.mjs"
 import exportCatCmd from "./export-category.mjs"
 import dumpGDocCmd from "./dump-gdoc.mjs"
+import extractCmd from "./extract.mjs"
 
 export const execsMap = produceExecsMap(
     archiveCmd,
@@ -14,7 +15,8 @@ export const execsMap = produceExecsMap(
     configCmd,
     exportCmd,
     exportCatCmd,
-    dumpGDocCmd
+    dumpGDocCmd,
+    extractCmd
 );
 
 export const definitionsList = produceDefinitionList(
@@ -24,5 +26,6 @@ export const definitionsList = produceDefinitionList(
     configCmd,
     exportCmd,
     exportCatCmd,
-    dumpGDocCmd
+    dumpGDocCmd,
+    extractCmd
 );

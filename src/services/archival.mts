@@ -8,13 +8,14 @@ import { ChannelType } from "discord-api-types/v10"
 import Config from "../config.mjs"
 import client from "./client.mjs"
 import { CategoryChannel, Message, TextChannel } from "discord.js"
+import { delay } from "../utils.mjs"
 
 const ARCHIVE_LIMIT = Config.archiveLimit;
 const CATEGORY_LIMIT = Config.categoryLimit;
 
-export class ArchiveFullError extends Error {}
-export class CategoryFullError extends Error {}
-export class NoSuchCategoryError extends Error {}
+export class ArchiveFullError extends Error { }
+export class CategoryFullError extends Error { }
+export class NoSuchCategoryError extends Error { }
 
 class ServerChannelsInfo {
     /**
@@ -72,7 +73,7 @@ export async function retrieveServerInfo(guildId: string): Promise<ServerChannel
  * @param guildId
  * @param categoryName
  * @param channelName 
- * @returns {{channelId: string, webhookId: string, webhookToken: string}} Info about the archival channel
+ * @returns Info about the archival channel
  * @throws When the archival server is full, when the category is full,
  * when there is no category, when there are repeated categories in the archival server,
  * or a network error.
@@ -93,10 +94,10 @@ export async function createArchiveChannel(guildId: string, categoryName: string
 
     const categoryId = archiveServer.catNamesIds.get(categoryName)
     const guild = await client.guilds.fetch(guildId)
-    const channel = await guild.channels.create({name: channelName, parent: categoryId, type: ChannelType.GuildText})
+    const channel = await guild.channels.create({ name: channelName, parent: categoryId, type: ChannelType.GuildText })
     const channelId = channel.id;
 
-    const webhook = await channel.createWebhook({name: channelName})
+    const webhook = await channel.createWebhook({ name: channelName })
     const webhookId = webhook.id;
     const webhookToken = webhook.token;
 
@@ -106,11 +107,11 @@ export async function createArchiveChannel(guildId: string, categoryName: string
 const mentionsRegex = /<@.*?>/gm
 /**
  * Retrieves all rp messages in a tidy format ready to be sent.
- * @param {string} targetChannelId The channel to retrieve the rp messages from
- * @returns {{avatarUrl: string, username: string, content: string}[]} The Rp messages
+ * @param targetId The channel to retrieve the rp messages from
+ * @returns The Rp messages
  */
-export async function retrieveAllRpMessages(targetChannelId) {
-    const channel = await client.channels.fetch(targetChannelId)
+export async function retrieveAllBotMessages(targetId: string) {
+    const channel = await client.channels.fetch(targetId)
     const rawMessages: Message[] = []
 
     if (!channel.isTextBased()) return []
@@ -118,6 +119,7 @@ export async function retrieveAllRpMessages(targetChannelId) {
     let lastMsgCount = Infinity
     let lastId = channel.lastMessageId
     while (lastMsgCount > 0) {
+        await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
         const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
         lastMsgCount = msgs.length
@@ -137,11 +139,12 @@ export async function retrieveAllRpMessages(targetChannelId) {
                 content
             }
         })
+        .reverse()
 }
 
 
-export async function retrieveAllMessages(targetChannelId): Promise<{ avatarUrl: string, username: string, content: string }[]> {
-    const channel = await client.channels.fetch(targetChannelId)
+export async function retrieveAllMessages(targetId: string): Promise<{ avatarUrl: string, username: string, content: string }[]> {
+    const channel = await client.channels.fetch(targetId)
     const rawMessages: Message[] = []
 
     if (!channel.isTextBased()) return []
@@ -149,11 +152,50 @@ export async function retrieveAllMessages(targetChannelId): Promise<{ avatarUrl:
     let lastMsgCount = Infinity
     let lastId = channel.lastMessageId
     while (lastMsgCount > 0) {
+        await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
         const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
         lastMsgCount = msgs.length
         lastId = msgs[msgs.length - 1].id
         rawMessages.push(...msgs)
+    }
+
+    return rawMessages
+        .map(({ author, content }) => {
+            content = content.trim().length === 0 ? "." : content
+            content = content.replaceAll(mentionsRegex, ".")
+
+            return {
+                avatarUrl: avatarHashToUrl(author.id, author.avatar),
+                username: author.username,
+                content
+            }
+        })
+        .reverse()
+}
+
+
+export async function retrieveMessagesRange(targetId: string, startId: string, stopId: string): Promise<{ avatarUrl: string, username: string, content: string }[]> {
+    const channel = await client.channels.fetch(targetId)
+    const rawMessages: Message[] = []
+
+    if (!channel.isTextBased()) return []
+
+    let lastMsgCount = Infinity
+    let lastId = startId
+    while (lastMsgCount > 0) {
+        await delay(2 * 1000)
+        lastMsgCount = 0
+        // @ts-ignore: This expression is not callable
+        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
+
+        for (let msg of msgs) {
+            lastMsgCount += 1
+            rawMessages.push(msg)
+            if (msg.id === stopId) break
+        }
+
+        lastId = msgs[lastMsgCount - 1].id
     }
 
     return rawMessages.map(({ author, content }) => {
@@ -165,5 +207,5 @@ export async function retrieveAllMessages(targetChannelId): Promise<{ avatarUrl:
             username: author.username,
             content
         }
-    })
+    }).reverse()
 }

@@ -118,6 +118,8 @@ export async function retrieveAllBotMessages(targetId: string) {
 
     let lastMsgCount = Infinity
     let lastId = channel.lastMessageId
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId))
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
@@ -152,6 +154,8 @@ export async function retrieveAllMessages(targetId: string): Promise<{ avatarUrl
 
     let lastMsgCount = Infinity
     let lastId = channel.lastMessageId
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId))
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
@@ -185,6 +189,8 @@ export async function retrieveMessagesRange(targetId: string, startId: string, s
 
     let lastMsgCount = Infinity
     let lastId = startId
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId))
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         lastMsgCount = 0

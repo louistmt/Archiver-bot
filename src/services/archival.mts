@@ -121,7 +121,7 @@ export async function retrieveAllBotMessages(targetId: string) {
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
-        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
+        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value)
         if (msgs.length === 0) break
         lastMsgCount = msgs.length
         lastId = msgs[msgs.length - 1].id
@@ -155,7 +155,7 @@ export async function retrieveAllMessages(targetId: string): Promise<{ avatarUrl
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
-        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
+        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value)
         if (msgs.length === 0) break
         lastMsgCount = msgs.length
         lastId = msgs[msgs.length - 1].id
@@ -189,8 +189,7 @@ export async function retrieveMessagesRange(targetId: string, startId: string, s
         await delay(2 * 1000)
         lastMsgCount = 0
         // @ts-ignore: This expression is not callable
-        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value)
-
+        const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value)
         if (msgs.length === 0) break
 
         for (let msg of msgs) {

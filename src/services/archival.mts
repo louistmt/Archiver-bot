@@ -198,11 +198,16 @@ export async function retrieveMessagesRange(targetId: string, startId: string, s
         const msgs: Message[] = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value)
         if (msgs.length === 0) break
 
+        let found = false
         for (let msg of msgs) {
             lastMsgCount += 1
             rawMessages.push(msg)
-            if (msg.id === stopId) break
+            if (msg.id === stopId) {
+                found = true
+                break
+            }
         }
+        if (found) break
 
         lastId = msgs[lastMsgCount - 1].id
     }

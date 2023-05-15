@@ -6,10 +6,10 @@ import { retrieveMessagesRange } from "../services/archival.mjs";
 const definition = new SlashCommandBuilder();
 definition.setName("extract");
 definition.setDescription("Extract a portion of a channel into json and webpage format");
-definition.addStringOption(option => option.setName("start")
+definition.addStringOption(option => option.setName("from")
     .setDescription("Id of the message it should start extracting from (inclusive)")
     .setRequired(true));
-definition.addStringOption(option => option.setName("stop")
+definition.addStringOption(option => option.setName("to")
     .setDescription("Id of the message it should stop at (inclusive)")
     .setRequired(true));
 definition.setDMPermission(false);
@@ -20,8 +20,8 @@ async function execute(interaction) {
     const user = interaction.user;
     const channel = interaction.channel;
     const name = capitalize(channel.name.replaceAll("-", " "));
-    const startId = interaction.options.getString("start");
-    const endId = interaction.options.getString("stop");
+    const startId = interaction.options.getString("to");
+    const endId = interaction.options.getString("from");
     await interaction.reply({ content: "One moment while I work on your request.", ephemeral: true });
     const messages = await retrieveMessagesRange(channel.id, startId, endId);
     if (messages.length === 0) {

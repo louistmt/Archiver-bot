@@ -97,10 +97,12 @@ export async function retrieveAllBotMessages(targetId) {
         return [];
     let lastMsgCount = Infinity;
     let lastId = channel.lastMessageId;
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId));
     while (lastMsgCount > 0) {
         await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
-        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value);
         if (msgs.length === 0)
             break;
         lastMsgCount = msgs.length;
@@ -127,10 +129,12 @@ export async function retrieveAllMessages(targetId) {
         return [];
     let lastMsgCount = Infinity;
     let lastId = channel.lastMessageId;
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId));
     while (lastMsgCount > 0) {
         await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
-        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value);
         if (msgs.length === 0)
             break;
         lastMsgCount = msgs.length;
@@ -156,11 +160,13 @@ export async function retrieveMessagesRange(targetId, startId, stopId) {
         return [];
     let lastMsgCount = Infinity;
     let lastId = startId;
+    // Fetch the first message since it won't be included in subsquent requests
+    rawMessages.push(await channel.messages.fetch(lastId));
     while (lastMsgCount > 0) {
         await delay(2 * 1000);
         lastMsgCount = 0;
         // @ts-ignore: This expression is not callable
-        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).map((value) => value);
         if (msgs.length === 0)
             break;
         for (let msg of msgs) {

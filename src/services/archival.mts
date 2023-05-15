@@ -12,24 +12,9 @@ import { CategoryChannel, Message, TextChannel } from "discord.js"
 const ARCHIVE_LIMIT = Config.archiveLimit;
 const CATEGORY_LIMIT = Config.categoryLimit;
 
-export class ArchivalError extends Error {
-    static REPEATED_CATEGORIES = 2;
-    static FULL = 3;
-    static CATEGORY_FULL = 4;
-    static NO_CATEGORY = 5;
-
-    type: number;
-
-    /**
-     * Constructor of an archival error
-     * @param {number} type Type of the error
-     * @param {string} msg The error message
-     */
-    constructor(type, msg) {
-        super(msg);
-        this.type = type;
-    }
-}
+export class ArchiveFullError extends Error {}
+export class CategoryFullError extends Error {}
+export class NoSuchCategoryError extends Error {}
 
 class ServerChannelsInfo {
     /**
@@ -98,13 +83,13 @@ export async function createArchiveChannel(guildId: string, categoryName: string
     const archiveServer = await retrieveServerInfo(guildId);
 
     if (archiveServer.channelCount == ARCHIVE_LIMIT)
-        throw new ArchivalError(ArchivalError.FULL, "The archival server is full")
+        throw new ArchiveFullError("The archival server is full")
 
     if (!archiveServer.catNamesIds.has(categoryName))
-        throw new ArchivalError(ArchivalError.NO_CATEGORY, `Category "${categoryName}" does not exist`)
+        throw new NoSuchCategoryError(`Category "${categoryName}" does not exist`)
 
     if (archiveServer.catTextChannels.get(categoryName).length === CATEGORY_LIMIT)
-        throw new ArchivalError(ArchivalError.CATEGORY_FULL, `Category "${categoryName}" is full`)
+        throw new CategoryFullError(`Category "${categoryName}" is full`)
 
     const categoryId = archiveServer.catNamesIds.get(categoryName)
     const guild = await client.guilds.fetch(guildId)

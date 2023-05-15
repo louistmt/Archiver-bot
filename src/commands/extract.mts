@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
 import { PermissionFlagsBits } from "discord-api-types/v9"
-import { AttachmentBuilder, ChatInputCommandInteraction, TextChannel } from "discord.js"
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js"
 import { Command } from "../libs/cmds.mjs"
 import { capitalize } from "../utils.mjs"
 import { retrieveMessagesRange } from "../services/archival.mjs"

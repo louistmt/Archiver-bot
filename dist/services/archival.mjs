@@ -6,25 +6,15 @@ import { avatarHashToUrl } from "../utils.mjs";
 import { ChannelType } from "discord-api-types/v10";
 import Config from "../config.mjs";
 import client from "./client.mjs";
+import { delay } from "../utils.mjs";
 const ARCHIVE_LIMIT = Config.archiveLimit;
 const CATEGORY_LIMIT = Config.categoryLimit;
-class ArchivalError extends Error {
-    static REPEATED_CATEGORIES = 2;
-    static FULL = 3;
-    static CATEGORY_FULL = 4;
-    static NO_CATEGORY = 5;
-    type;
-    /**
-     * Constructor of an archival error
-     * @param {number} type Type of the error
-     * @param {string} msg The error message
-     */
-    constructor(type, msg) {
-        super(msg);
-        this.type = type;
-    }
+export class ArchiveFullError extends Error {
 }
-export { ArchivalError };
+export class CategoryFullError extends Error {
+}
+export class NoSuchCategoryError extends Error {
+}
 class ServerChannelsInfo {
     /**
      * Total number of channes in the server
@@ -71,7 +61,7 @@ export async function retrieveServerInfo(guildId) {
  * @param guildId
  * @param categoryName
  * @param channelName
- * @returns {{channelId: string, webhookId: string, webhookToken: string}} Info about the archival channel
+ * @returns Info about the archival channel
  * @throws When the archival server is full, when the category is full,
  * when there is no category, when there are repeated categories in the archival server,
  * or a network error.
@@ -80,11 +70,11 @@ export async function createArchiveChannel(guildId, categoryName, channelName) {
     // Retrieve archive server info
     const archiveServer = await retrieveServerInfo(guildId);
     if (archiveServer.channelCount == ARCHIVE_LIMIT)
-        throw new ArchivalError(ArchivalError.FULL, "The archival server is full");
+        throw new ArchiveFullError("The archival server is full");
     if (!archiveServer.catNamesIds.has(categoryName))
-        throw new ArchivalError(ArchivalError.NO_CATEGORY, `Category "${categoryName}" does not exist`);
+        throw new NoSuchCategoryError(`Category "${categoryName}" does not exist`);
     if (archiveServer.catTextChannels.get(categoryName).length === CATEGORY_LIMIT)
-        throw new ArchivalError(ArchivalError.CATEGORY_FULL, `Category "${categoryName}" is full`);
+        throw new CategoryFullError(`Category "${categoryName}" is full`);
     const categoryId = archiveServer.catNamesIds.get(categoryName);
     const guild = await client.guilds.fetch(guildId);
     const channel = await guild.channels.create({ name: channelName, parent: categoryId, type: ChannelType.GuildText });
@@ -97,17 +87,18 @@ export async function createArchiveChannel(guildId, categoryName, channelName) {
 const mentionsRegex = /<@.*?>/gm;
 /**
  * Retrieves all rp messages in a tidy format ready to be sent.
- * @param {string} targetChannelId The channel to retrieve the rp messages from
- * @returns {{avatarUrl: string, username: string, content: string}[]} The Rp messages
+ * @param targetId The channel to retrieve the rp messages from
+ * @returns The Rp messages
  */
-export async function retrieveAllRpMessages(targetChannelId) {
-    const channel = await client.channels.fetch(targetChannelId);
+export async function retrieveAllBotMessages(targetId) {
+    const channel = await client.channels.fetch(targetId);
     const rawMessages = [];
     if (!channel.isTextBased())
         return [];
     let lastMsgCount = Infinity;
     let lastId = channel.lastMessageId;
     while (lastMsgCount > 0) {
+        await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
         const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
         lastMsgCount = msgs.length;
@@ -124,21 +115,55 @@ export async function retrieveAllRpMessages(targetChannelId) {
             username: author.username,
             content
         };
-    });
+    })
+        .reverse();
 }
-export async function retrieveAllMessages(targetChannelId) {
-    const channel = await client.channels.fetch(targetChannelId);
+export async function retrieveAllMessages(targetId) {
+    const channel = await client.channels.fetch(targetId);
     const rawMessages = [];
     if (!channel.isTextBased())
         return [];
     let lastMsgCount = Infinity;
     let lastId = channel.lastMessageId;
     while (lastMsgCount > 0) {
+        await delay(2 * 1000);
         // @ts-ignore: This expression is not callable
         const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
         lastMsgCount = msgs.length;
         lastId = msgs[msgs.length - 1].id;
         rawMessages.push(...msgs);
+    }
+    return rawMessages
+        .map(({ author, content }) => {
+        content = content.trim().length === 0 ? "." : content;
+        content = content.replaceAll(mentionsRegex, ".");
+        return {
+            avatarUrl: avatarHashToUrl(author.id, author.avatar),
+            username: author.username,
+            content
+        };
+    })
+        .reverse();
+}
+export async function retrieveMessagesRange(targetId, startId, stopId) {
+    const channel = await client.channels.fetch(targetId);
+    const rawMessages = [];
+    if (!channel.isTextBased())
+        return [];
+    let lastMsgCount = Infinity;
+    let lastId = startId;
+    while (lastMsgCount > 0) {
+        await delay(2 * 1000);
+        lastMsgCount = 0;
+        // @ts-ignore: This expression is not callable
+        const msgs = (await channel.messages.fetch({ cache: false, before: lastId, limit: 100 })).mapValues((value) => value);
+        for (let msg of msgs) {
+            lastMsgCount += 1;
+            rawMessages.push(msg);
+            if (msg.id === stopId)
+                break;
+        }
+        lastId = msgs[lastMsgCount - 1].id;
     }
     return rawMessages.map(({ author, content }) => {
         content = content.trim().length === 0 ? "." : content;
@@ -148,5 +173,5 @@ export async function retrieveAllMessages(targetChannelId) {
             username: author.username,
             content
         };
-    });
+    }).reverse();
 }

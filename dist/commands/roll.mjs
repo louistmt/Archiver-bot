@@ -27,10 +27,19 @@ async function execute(interaction) {
     for (let i = 0; i < count; i++) {
         result.push(Math.floor(Math.random() * die) + 1 + sum);
     }
-    await interaction.reply({
-        content: `Here are the results: \`\`${result.join(", ")}\`\``,
-        ephemeral: !isPublic
-    });
+    const response = `Here are the results: \`\`${result.join(", ")}\`\``;
+    if (response.length <= 2000) {
+        await interaction.reply({
+            content: `Here are the results: \`\`${result.join(", ")}\`\``,
+            ephemeral: !isPublic
+        });
+    }
+    else {
+        await interaction.reply({
+            content: "The response goes over 2000 characters. Choose lower values",
+            ephemeral: true
+        });
+    }
 }
 const rollCmd = { definition, execute };
 export default rollCmd;

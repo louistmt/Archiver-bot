@@ -27,7 +27,7 @@ async function execute(interaction) {
     for (let i = 0; i < count; i++) {
         result.push(Math.floor(Math.random() * die) + 1 + sum);
     }
-    const response = `Here are the results: \`\`${result.join(", ")}\`\``;
+    const response = `Here are the results: \`\`${result.sort().reverse().join(", ")}\`\``;
     if (response.length <= 2000) {
         await interaction.reply({
             content: `Here are the results: \`\`${result.join(", ")}\`\``,

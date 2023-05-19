@@ -88,11 +88,13 @@ export async function createArchiveChannel(guildId: string, categoryName: string
 
     if (!archiveServer.catNamesIds.has(categoryName))
         throw new NoSuchCategoryError(`Category "${categoryName}" does not exist`)
+    
+    const categoryId = archiveServer.catNamesIds.get(categoryName)
 
-    if (archiveServer.catTextChannels.get(categoryName).length === CATEGORY_LIMIT)
+    if (archiveServer.catTextChannels.get(categoryId).length === CATEGORY_LIMIT)
         throw new CategoryFullError(`Category "${categoryName}" is full`)
 
-    const categoryId = archiveServer.catNamesIds.get(categoryName)
+    
     const guild = await client.guilds.fetch(guildId)
     const channel = await guild.channels.create({ name: channelName, parent: categoryId, type: ChannelType.GuildText })
     const channelId = channel.id;

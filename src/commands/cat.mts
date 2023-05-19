@@ -78,6 +78,7 @@ async function executeCatList(interaction: ChatInputCommandInteraction) {
     reply += `\`\`Archive Capacity: ${archiveServer.channelCount}/${Config.archiveLimit} channels\`\`\n\n`
 
     for (let [name, id] of archiveServer.catNamesIds) {
+        console.log(archiveServer.catTextChannels)
         const channels = archiveServer.catTextChannels.get(id)
         reply += `\`\`${name} Capacity: ${channels.length}/${Config.categoryLimit} channels\`\`\n`
     }

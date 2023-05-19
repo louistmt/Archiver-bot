@@ -1,6 +1,7 @@
 import Tasker from "./tasker.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "./archival.mjs";
 import client from "./client.mjs";
+import { delay } from "../utils.mjs";
 async function createDestTask(jobId, data, tasker) {
     const { destServerId, srcChannelName, destCategoryName, srcChannelId } = data;
     const { webhookId, webhookToken } = await createArchiveChannel(destServerId, destCategoryName, srcChannelName);
@@ -17,6 +18,7 @@ async function getMsgsTask(jobId, data, tasker) {
 }
 export async function sendMsgTask(jobId, data, tasker) {
     const { webhookId, webhookToken, avatarUrl, content, username } = data;
+    await delay(3 * 1000);
     const webhook = await client.fetchWebhook(webhookId, webhookToken);
     webhook.send({ avatarURL: avatarUrl, content, username });
 }

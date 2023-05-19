@@ -3,6 +3,7 @@ import Tasker from "./tasker.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "./archival.mjs";
 import client from "./client.mjs";
 import { TextChannel } from "discord.js";
+import { delay } from "../utils.mjs";
 
 type ArchiveJob = {
     srcChannelId: string
@@ -49,6 +50,7 @@ async function getMsgsTask(jobId: string, data: GetMsgs, tasker: ITasker) {
 
 export async function sendMsgTask(jobId: string, data: SendMsg, tasker: ITasker) {
     const { webhookId, webhookToken, avatarUrl, content, username } = data
+    await delay(3 * 1000)
     const webhook = await client.fetchWebhook(webhookId, webhookToken)
     webhook.send({avatarURL: avatarUrl, content, username})
 }

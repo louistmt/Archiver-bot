@@ -43,16 +43,15 @@ export async function retrieveServerInfo(guildId) {
     const textChannels = channels.filter((channel) => channel.type === ChannelType.GuildText);
     const categoryChannels = channels.filter((channel) => channel.type === ChannelType.GuildCategory);
     serverInfo.channelCount = channels.length;
-    textChannels.forEach((channel) => {
-        if (!channel.parentId)
-            return;
-        if (!serverInfo.catTextChannels.has(channel.parentId))
-            serverInfo.catTextChannels.set(channel.parentId, []);
-        serverInfo.catTextChannels.get(channel.parentId).push(channel);
-    });
     categoryChannels.forEach((channel) => {
         serverInfo.catChannels.set(channel.id, channel);
         serverInfo.catNamesIds.set(channel.name, channel.id);
+        serverInfo.catTextChannels.set(channel.id, []);
+    });
+    textChannels.forEach((channel) => {
+        if (!channel.parentId)
+            return;
+        serverInfo.catTextChannels.get(channel.parentId).push(channel);
     });
     return serverInfo;
 }

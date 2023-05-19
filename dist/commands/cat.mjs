@@ -53,8 +53,9 @@ async function executeCatList(interaction) {
     const archiveServer = await retrieveServerInfo(archiveServerId);
     let reply = "**Archive Status**\n_ _\n_ _\n";
     reply += `\`\`Archive Capacity: ${archiveServer.channelCount}/${Config.archiveLimit} channels\`\`\n\n`;
-    for (let [category, channels] of archiveServer.catTextChannels) {
-        reply += `\`\`${category} Capacity: ${channels.length}/${Config.categoryLimit} channels\`\`\n`;
+    for (let [name, id] of archiveServer.catNamesIds) {
+        const channels = archiveServer.catTextChannels.get(id);
+        reply += `\`\`${name} Capacity: ${channels.length}/${Config.categoryLimit} channels\`\`\n`;
     }
     await interaction.reply(reply);
 }

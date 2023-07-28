@@ -4,6 +4,7 @@
   "description": "Archiving bot for Avalon's Gate RP server",
   "main": "dist/index.mjs",
   "type": "module",
+  "private": true,
   "scripts": {
     "start": "node --trace-warnings ./scripts/dist-start.mjs",
     "replit:start": "node --trace-warnings ./scripts/replit-start.mjs",

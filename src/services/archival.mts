@@ -118,9 +118,7 @@ export async function retrieveAllBotMessages(targetId: string) {
     if (!channel.isTextBased()) return []
 
     let lastMsgCount = Infinity
-    let lastId = channel.lastMessageId
-    // Fetch the first message since it won't be included in subsquent requests
-    rawMessages.push(await channel.messages.fetch(lastId))
+    let lastId = undefined
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
@@ -154,9 +152,7 @@ export async function retrieveAllMessages(targetId: string): Promise<{ avatarUrl
     if (!channel.isTextBased()) return []
 
     let lastMsgCount = Infinity
-    let lastId = channel.lastMessageId
-    // Fetch the first message since it won't be included in subsquent requests
-    rawMessages.push(await channel.messages.fetch(lastId))
+    let lastId = undefined
     while (lastMsgCount > 0) {
         await delay(2 * 1000)
         // @ts-ignore: This expression is not callable
@@ -164,6 +160,7 @@ export async function retrieveAllMessages(targetId: string): Promise<{ avatarUrl
         if (msgs.length === 0) break
         lastMsgCount = msgs.length
         lastId = msgs[msgs.length - 1].id
+        console.log(msgs);
         rawMessages.push(...msgs)
     }
 

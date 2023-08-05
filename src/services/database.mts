@@ -4,6 +4,7 @@ import Config from "../config.mjs"
 export const sequelize = new Sequelize({
     database: "db",
     dialect: "sqlite",
+    logging: false,
     storage: Config.paths.sqlite3
 })
 

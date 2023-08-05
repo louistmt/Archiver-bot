@@ -23,7 +23,7 @@ async function exportWebPageExecute(interaction: ChatInputCommandInteraction) {
     const srcChannelName = srcChannel.name
     const destChannelId = interaction.options.getChannel("dest-channel").id
 
-    await Exporter.queue(`export-${srcChannelId}`, {format: "json", srcChannelId, srcChannelName, destChannelId})
+    await Exporter.queue(`export-${srcChannelId}`, {format: "webpage", srcChannelId, srcChannelName, destChannelId})
     await interaction.reply(`Exporting ${srcChannelName} as a viewable link`);
 }
 

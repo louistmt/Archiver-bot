@@ -134,7 +134,6 @@ export async function retrieveAllMessages(targetId) {
             break;
         lastMsgCount = msgs.length;
         lastId = msgs[msgs.length - 1].id;
-        console.log(msgs);
         rawMessages.push(...msgs);
     }
     return rawMessages
@@ -156,7 +155,7 @@ export async function retrieveMessagesRange(targetId, startId, stopId) {
         return [];
     let lastMsgCount = Infinity;
     let lastId = startId;
-    // Fetch the first message since it won't be included in subsquent requests
+    // Fetch the first message since it won't be included in subsequent requests
     rawMessages.push(await channel.messages.fetch(lastId));
     while (lastMsgCount > 0) {
         await delay(2 * 1000);

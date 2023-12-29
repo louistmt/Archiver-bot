@@ -2,7 +2,7 @@ import client from "./services/client.mjs";
 import Tasker from "./services/tasker.mjs";
 import Config from "./config.mjs";
 import { execsMap } from "./commands/index.mjs";
-import { singleCallFix, preLogs } from "./utils.mjs";
+import { singleCallFix, preLogs, tryReplyError } from "./utils.mjs";
 const { log, error } = preLogs("Client");
 // Logging unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
@@ -41,7 +41,7 @@ export default async function startup() {
         catch (err) {
             error(`Error while handling interaction for command ${interaction.commandName}`);
             error(err);
-            await interaction.reply(`There was an error while handling this command.`);
+            tryReplyError(interaction, err);
         }
     });
     log("Starting up client");

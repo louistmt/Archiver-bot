@@ -199,3 +199,16 @@ export function arrayToSet(array) {
     }
     return set;
 }
+export async function tryReplyError(interaction, err) {
+    try {
+        if (interaction.replied) {
+            await interaction.followUp(`There was an error while handling this command. Warn the dev.`);
+            await interaction.followUp(err.message);
+        }
+        else {
+            await interaction.reply(`There was an error while handling this command. Warn the dev.`);
+            await interaction.followUp(err.message);
+        }
+    }
+    catch { /*ignored*/ }
+}

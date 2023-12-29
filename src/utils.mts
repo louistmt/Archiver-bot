@@ -1,4 +1,5 @@
-import {accessSync, constants, readFileSync, writeFileSync, openSync, closeSync} from "node:fs";
+import { accessSync, constants, readFileSync, writeFileSync, openSync, closeSync } from "node:fs";
+import type { CommandInteraction } from 'discord.js';
 
 /**
  * Used to create a multiline string until indentation for multiline strings
@@ -24,7 +25,7 @@ export function capitalize(str: string): string {
  * @param {number} duration Time in miliseconds.
  * @returns 
  */
- export function delay(duration) {
+export function delay(duration) {
     return new Promise((resolve) => {
         // console.log("Delaying");
         setTimeout(resolve, duration);
@@ -36,7 +37,7 @@ export function capitalize(str: string): string {
  * @param {string} userId
  * @param {string} hash 
  */
- export function avatarHashToUrl(userId, hash) {
+export function avatarHashToUrl(userId, hash) {
     return `https://cdn.discordapp.com/avatars/${userId}/${hash}`;
 }
 
@@ -44,7 +45,7 @@ export function capitalize(str: string): string {
  * Parses a channel mention into a channel id.
  * @param {string} data 
  */
- export function parseChannelMentionToId(data) {
+export function parseChannelMentionToId(data) {
     return data.replace("<#", "").replace(">", "");
 }
 
@@ -53,7 +54,7 @@ export function capitalize(str: string): string {
  * Parses a user mention into a user id
  * @param {string} data 
  */
- export function parseUserMentionToId(data) {
+export function parseUserMentionToId(data) {
     return data.replace("<@", "").replace("!", "").replace(">", "");
 }
 
@@ -68,7 +69,7 @@ export function singleCallFix(func) {
     function singleCall() {
         if (!called) {
             called = true;
-            return func(arguments);  
+            return func(arguments);
         }
     }
 
@@ -104,7 +105,7 @@ export function preLogs(prefix) {
     const log = (...args) => console.log(`[${time()} ${prefix}]:`, ...args);
     const error = (...args) => console.error(`[${time()} ${prefix}]:`, ...args);
 
-    return {log, error};
+    return { log, error };
 }
 
 
@@ -128,10 +129,10 @@ export const TimeUnits = {
      * @param {number} amount 
      */
     minutes: (amount) => amount * 1000 * 60,
-     /**
-     * Returns the specified amount of hours in miliseconds.
-     * @param {number} amount 
-     */
+    /**
+    * Returns the specified amount of hours in miliseconds.
+    * @param {number} amount 
+    */
     hours: (amount) => amount * 1000 * 60 * 60,
     /**
      * Returns the specified amount of days in miliseconds.
@@ -149,7 +150,7 @@ export function fileExists(path) {
     try {
         accessSync(path, constants.R_OK | constants.W_OK)
         return true;
-    } catch (err){
+    } catch (err) {
         return false;
     }
 }
@@ -164,7 +165,7 @@ export function createFile(path) {
  * @returns {Object} The JSON Object
  */
 export function readJSONFile(path) {
-    return JSON.parse(readFileSync(path, {encoding: "utf-8"}))
+    return JSON.parse(readFileSync(path, { encoding: "utf-8" }))
 }
 
 /**
@@ -173,7 +174,7 @@ export function readJSONFile(path) {
  * @param {Object} obj The object to save 
  */
 export function writeJSONFile(path, obj) {
-    return writeFileSync(path, JSON.stringify(obj, undefined, 4), {encoding: "utf-8"})
+    return writeFileSync(path, JSON.stringify(obj, undefined, 4), { encoding: "utf-8" })
 }
 
 /**
@@ -231,4 +232,17 @@ export function arrayToSet(array) {
     }
 
     return set;
+}
+
+export async function tryReplyError(interaction: CommandInteraction, err: Error) {
+    try {
+        if (interaction.replied) {
+            await interaction.followUp(`There was an error while handling this command. Warn the dev.`)
+            await interaction.followUp(err.message)
+        }
+        else {
+            await interaction.reply(`There was an error while handling this command. Warn the dev.`)
+            await interaction.followUp(err.message)
+        }
+    } catch {/*ignored*/ }
 }

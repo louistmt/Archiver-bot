@@ -1,5 +1,5 @@
-import type { IJobQueue, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs";
-import Tasker from "./tasker.mjs";
+import type { IJobQueue, ITasker, TaskFunction } from "./tasker/interfaces.mjs";
+import Tasker from "./tasker/implementation.mjs";
 import { createArchiveChannel, retrieveAllMessages } from "./archival.mjs";
 import client from "./client.mjs";
 import { TextChannel } from "discord.js";

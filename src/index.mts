@@ -1,5 +1,5 @@
 import client from "./services/client.mjs"
-import Tasker from "./services/tasker.mjs"
+import Tasker from "./services/tasker/implementation.mjs"
 
 import Config from "./config.mjs"
 import { execsMap } from "./commands/index.mjs"

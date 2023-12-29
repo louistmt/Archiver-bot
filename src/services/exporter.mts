@@ -1,5 +1,5 @@
-import Tasker from "./tasker.mjs"
-import type { IJobQueue, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs"
+import Tasker from "./tasker/implementation.mjs"
+import type { IJobQueue, ITasker, TaskFunction } from "./tasker/interfaces.mjs"
 import { retrieveAllMessages } from "./archival.mjs"
 import { capitalize } from "../utils.mjs"
 import { AttachmentBuilder, TextChannel } from "discord.js"

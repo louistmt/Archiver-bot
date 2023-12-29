@@ -1,7 +1,7 @@
-import { JobTasks, Jobs, sequelize } from "./database.mjs";
-import { Controller, ITasker, TaskFunction } from "../libs/interfaces/tasker.mjs";
-import { JSONType } from "../libs/common.mjs";
-import { preLogs } from "../utils.mjs";
+import { JobTasks, Jobs, sequelize } from "../database.mjs";
+import { Controller, ITasker, TaskFunction } from "./interfaces.mjs";
+import { JSONType } from "../../libs/common.mjs";
+import { preLogs } from "../../utils.mjs";
 
 const {log, error} = preLogs("Tasker")
 const handlerMap: Map<string, TaskFunction> = new Map()

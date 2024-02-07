@@ -1,4 +1,4 @@
-import Tasker from "./tasker.mjs";
+import Tasker from "./tasker/implementation.mjs";
 import { retrieveAllMessages } from "./archival.mjs";
 import { capitalize } from "../utils.mjs";
 import { AttachmentBuilder } from "discord.js";
